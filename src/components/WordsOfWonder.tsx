@@ -5,7 +5,7 @@ import {
     LightBulbIcon,
     PaperAirplaneIcon,
     PlusIcon,
-    TrashIcon,
+    // TrashIcon,
 } from "@heroicons/react/20/solid";
 import Button from "./Button";
 import Title from "./Title";
@@ -25,6 +25,36 @@ function WordsOfWonder() {
         const newGrid = generateGrid(rows, columns, selectedWords);
         dispatch({ type: ACTIONS.INIT_GRID, payload: { grid: newGrid, words: selectedWords } });
     }, [dispatch]);
+
+    const handleNewGame = () => {
+        const selectedWords = getRandomWords((rows * columns) / 5);
+        const newGrid = generateGrid(rows, columns, selectedWords);
+        dispatch({
+            type: ACTIONS.INIT_GRID,
+            payload: { grid: newGrid, words: selectedWords },
+        });
+    };
+
+    const handleRestartGame = () => {
+        dispatch({ type: ACTIONS.RESET_GAME });
+        const selectedWords = getRandomWords((rows * columns) / 5);
+        const newGrid = generateGrid(rows, columns, selectedWords);
+        dispatch({
+            type: ACTIONS.INIT_GRID,
+            payload: { grid: newGrid, words: selectedWords },
+        });
+    };
+
+    const handleFinishGame = () => {
+        dispatch({ type: ACTIONS.FINISH_GAME });
+        alert("🎉 Game Finished! Your progress is saved.");
+    };
+
+    const handleNeedHelp = () => {
+        dispatch({ type: ACTIONS.NEED_HELP });
+        alert("💡 Hint: Look carefully! One of your words is hidden diagonally 😉");
+    };
+
     return (
         <div className="w-full h-dvh bg-gray-800 flex flex-col items-center justify-center">
             <div className="flex items-center justify-center gap-10 px-4 mb-10">
@@ -45,31 +75,37 @@ function WordsOfWonder() {
                                 icon={<PlusIcon className="size-8" />}
                                 text="New Game"
                                 style="bg-gray-700 text-white w-full"
-                                onClick={() => alert("New Game")}
+                                onClick={handleNewGame}
                             />
                             <Button
                                 icon={<ArrowPathIcon className="size-8" />}
                                 text="Restart Game"
                                 style="bg-gray-700 text-white w-full"
-                                onClick={() => alert("Restart Game")}
+                                onClick={handleRestartGame}
                             />
-                            <Button
+                            {/* <Button
+                                icon={<ShieldCheckIcon className="size-8" />}
+                                text="Validate Word"
+                                style="bg-gray-700 text-white w-full"
+                                onClick={() => alert("Validate")}
+                                />
+                                <Button
                                 icon={<TrashIcon className="size-8" />}
                                 text="Clear Selection"
                                 style="bg-gray-700 text-white w-full"
                                 onClick={() => alert("Clear")}
-                            />
+                                /> */}
                             <Button
                                 icon={<PaperAirplaneIcon className="size-8" />}
                                 text="Finish Game"
                                 style="bg-gray-700 text-white w-full"
-                                onClick={() => alert("Finish")}
+                                onClick={handleFinishGame}
                             />
                             <Button
                                 icon={<LightBulbIcon className="size-8" />}
                                 text="Need Help"
                                 style="bg-gray-700 text-white w-full"
-                                onClick={() => alert("Hint")}
+                                onClick={handleNeedHelp}
                             />
                         </div>
                     </>

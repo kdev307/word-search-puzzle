@@ -4,10 +4,12 @@ export const ACTIONS = {
     SELECT_CELL: "SELECT_CELL",
     UNSELECT_CELL: "UNSELECT_CELL",
     VALIDATE_WORD: "VALIDATE_WORD",
+    NEW_GAME: "NEW_GAME",
     RESET_GAME: "RESET_GAME",
     READY_GAME: "READY_GAME",
     FINISH_GAME: "FINISH_GAME",
     CLEAR_SELECTION: "CLEAR_SELECTION",
+    NEED_HELP: "NEED_HELP",
 } as const;
 
 export type ActionType = (typeof ACTIONS)[keyof typeof ACTIONS];

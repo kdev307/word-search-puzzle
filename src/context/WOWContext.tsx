@@ -1,13 +1,14 @@
 import { createContext, useReducer } from "react";
 import type { ReactNode, Dispatch } from "react";
-import { ACTIONS } from "../constants/actions";
+import { ACTIONS, type ActionType } from "../constants/actions";
 
 interface WOWState {
     grid: string[][];
+    words: string[];
     currentWord: string;
     score: number;
     foundWords: string[];
-    status: string;
+    status: ActionType;
     loading: boolean;
 }
 
@@ -21,7 +22,24 @@ interface InitGridAction {
     payload: { grid: string[][]; words: string[] };
 }
 
-type WOWAction = LoadingAction | InitGridAction;
+interface ResetGameAction {
+    type: typeof ACTIONS.RESET_GAME;
+}
+
+interface FinishGameAction {
+    type: typeof ACTIONS.FINISH_GAME;
+}
+
+interface NeedHelpAction {
+    type: typeof ACTIONS.NEED_HELP;
+}
+
+type WOWAction =
+    | LoadingAction
+    | InitGridAction
+    | ResetGameAction
+    | FinishGameAction
+    | NeedHelpAction;
 
 interface WOWContextType extends WOWState {
     dispatch: Dispatch<WOWAction>;
@@ -29,6 +47,7 @@ interface WOWContextType extends WOWState {
 
 const initialState: WOWState = {
     grid: [],
+    words: [],
     currentWord: "",
     score: 0,
     foundWords: [],
@@ -41,7 +60,32 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
         case ACTIONS.LOADING:
             return { ...state, loading: action.payload };
         case ACTIONS.INIT_GRID:
-            return { ...state, grid: action.payload.grid, loading: false };
+            return {
+                ...state,
+                grid: action.payload.grid,
+                words: action.payload.words,
+                loading: false,
+                status: ACTIONS.READY_GAME,
+            };
+
+        case ACTIONS.RESET_GAME:
+            return {
+                ...initialState,
+                loading: false,
+                status: ACTIONS.READY_GAME,
+            };
+
+        case ACTIONS.FINISH_GAME:
+            return {
+                ...state,
+                status: ACTIONS.FINISH_GAME,
+            };
+
+        case ACTIONS.NEED_HELP:
+            return {
+                ...state,
+                status: ACTIONS.NEED_HELP,
+            };
         default:
             throw new Error("Unknown Action");
     }
@@ -54,7 +98,7 @@ interface WOWProviderProps {
 }
 
 function WOWProvider({ children }: WOWProviderProps) {
-    const [{ grid, currentWord, score, foundWords, status, loading }, dispatch] = useReducer(
+    const [{ grid, words, currentWord, score, foundWords, status, loading }, dispatch] = useReducer(
         wowReducer,
         initialState
     );
@@ -63,6 +107,7 @@ function WOWProvider({ children }: WOWProviderProps) {
         <WOWContext.Provider
             value={{
                 grid,
+                words,
                 currentWord,
                 score,
                 foundWords,
