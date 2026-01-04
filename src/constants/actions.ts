@@ -1,0 +1,13 @@
+export const ACTIONS = {
+    LOADING: "LOADING",
+    INIT_GRID: "INIT_GRID",
+    SELECT_CELL: "SELECT_CELL",
+    UNSELECT_CELL: "UNSELECT_CELL",
+    VALIDATE_WORD: "VALIDATE_WORD",
+    RESET_GAME: "RESET_GAME",
+    READY_GAME: "READY_GAME",
+    FINISH_GAME: "FINISH_GAME",
+    CLEAR_SELECTION: "CLEAR_SELECTION",
+} as const;
+
+export type ActionType = (typeof ACTIONS)[keyof typeof ACTIONS];
