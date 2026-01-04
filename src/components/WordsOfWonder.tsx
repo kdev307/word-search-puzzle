@@ -15,13 +15,15 @@ import { columns, rows } from "../constants/game";
 import { generateGrid } from "../utils/generateGrid";
 import { ACTIONS } from "../constants/actions";
 import Loader from "./Loader";
+import { getRandomWords } from "../utils/getRandomWords";
 
 function WordsOfWonder() {
     const { loading, dispatch, grid } = useWOW();
 
     useEffect(() => {
-        const newGrid = generateGrid(rows, columns);
-        dispatch({ type: ACTIONS.INIT_GRID, payload: newGrid });
+        const selectedWords = getRandomWords((rows * columns) / 5);
+        const newGrid = generateGrid(rows, columns, selectedWords);
+        dispatch({ type: ACTIONS.INIT_GRID, payload: { grid: newGrid, words: selectedWords } });
     }, [dispatch]);
     return (
         <div className="w-full h-dvh bg-gray-800 flex flex-col items-center justify-center">

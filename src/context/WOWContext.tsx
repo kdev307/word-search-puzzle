@@ -18,7 +18,7 @@ interface LoadingAction {
 
 interface InitGridAction {
     type: typeof ACTIONS.INIT_GRID;
-    payload: string[][];
+    payload: { grid: string[][]; words: string[] };
 }
 
 type WOWAction = LoadingAction | InitGridAction;
@@ -41,13 +41,12 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
         case ACTIONS.LOADING:
             return { ...state, loading: action.payload };
         case ACTIONS.INIT_GRID:
-            return { ...state, grid: action.payload, loading: false };
+            return { ...state, grid: action.payload.grid, loading: false };
         default:
             throw new Error("Unknown Action");
     }
 }
 
-// ✅ FIXED LINE
 const WOWContext = createContext(undefined as WOWContextType | undefined);
 
 interface WOWProviderProps {
