@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
     ArrowPathIcon,
     InformationCircleIcon,
@@ -9,8 +10,19 @@ import {
 import Button from "./Button";
 import Title from "./Title";
 import Grid from "./Grid";
+import useWOW from "../hooks/useWOW";
+import { columns, rows } from "../constants/game";
+import { generateGrid } from "../utils/generateGrid";
+import { ACTIONS } from "../constants/actions";
+import Loader from "./Loader";
 
 function WordsOfWonder() {
+    const { loading, dispatch, grid } = useWOW();
+
+    useEffect(() => {
+        const newGrid = generateGrid(rows, columns);
+        dispatch({ type: ACTIONS.INIT_GRID, payload: newGrid });
+    }, [dispatch]);
     return (
         <div className="w-full h-dvh bg-gray-800 flex flex-col items-center justify-center">
             <div className="flex items-center justify-center gap-10 px-4 mb-10">
@@ -21,39 +33,45 @@ function WordsOfWonder() {
                 <InformationCircleIcon className="size-10 text-gray-200" />
             </div>
             <div className="flex items-center justify-evenly gap-10">
-                <Grid />
-                <div className="flex flex-col items-center justify-center gap-10 px-10 py-5 w-3/4">
-                    <Button
-                        icon={<PlusIcon className="size-8" />}
-                        text="New Game"
-                        style="bg-gray-700 text-white w-full"
-                        onClick={() => alert("New Game")}
-                    />
-                    <Button
-                        icon={<ArrowPathIcon className="size-8" />}
-                        text="Restart Game"
-                        style="bg-gray-700 text-white w-full"
-                        onClick={() => alert("Restart Game")}
-                    />
-                    <Button
-                        icon={<TrashIcon className="size-8" />}
-                        text="Clear Selection"
-                        style="bg-gray-700 text-white w-full"
-                        onClick={() => alert("Clear")}
-                    />
-                    <Button
-                        icon={<PaperAirplaneIcon className="size-8" />}
-                        text="Finish Game"
-                        style="bg-gray-700 text-white w-full"
-                        onClick={() => alert("Finish")}
-                    />
-                    <Button
-                        icon={<LightBulbIcon className="size-8" />}
-                        text="Need Help"
-                        style="bg-gray-700 text-white w-full"
-                        onClick={() => alert("Hint")}
-                    />
-                </div>
+                {loading ? (
+                    <Loader rows={rows} columns={columns} />
+                ) : (
+                    <>
+                        <Grid grid={grid} />
+                        <div className="flex flex-col items-center justify-center gap-10 px-10 py-5 w-3/4">
+                            <Button
+                                icon={<PlusIcon className="size-8" />}
+                                text="New Game"
+                                style="bg-gray-700 text-white w-full"
+                                onClick={() => alert("New Game")}
+                            />
+                            <Button
+                                icon={<ArrowPathIcon className="size-8" />}
+                                text="Restart Game"
+                                style="bg-gray-700 text-white w-full"
+                                onClick={() => alert("Restart Game")}
+                            />
+                            <Button
+                                icon={<TrashIcon className="size-8" />}
+                                text="Clear Selection"
+                                style="bg-gray-700 text-white w-full"
+                                onClick={() => alert("Clear")}
+                            />
+                            <Button
+                                icon={<PaperAirplaneIcon className="size-8" />}
+                                text="Finish Game"
+                                style="bg-gray-700 text-white w-full"
+                                onClick={() => alert("Finish")}
+                            />
+                            <Button
+                                icon={<LightBulbIcon className="size-8" />}
+                                text="Need Help"
+                                style="bg-gray-700 text-white w-full"
+                                onClick={() => alert("Hint")}
+                            />
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
