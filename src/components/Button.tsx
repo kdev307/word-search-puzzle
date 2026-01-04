@@ -24,7 +24,7 @@ function Button({
             disabled={disabled}
             className={`
         text-xl py-4 px-6 font-medium rounded-full border-2 hover:bg-gray-100 hover:text-gray-800 
-        cursor-pointer w-full transition-colors duration-300 ease-in-out flex items-center justify-between
+        cursor-pointer w-full transition-colors duration-300 ease-in-out flex items-center justify-center gap-6
         whitespace-nowrap ${style}
       `}
         >
