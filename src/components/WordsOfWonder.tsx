@@ -62,11 +62,7 @@ function WordsOfWonder() {
             ) : (
                 <>
                     <div className="flex items-center justify-center gap-10 px-4">
-                        <Title
-                            as="h1"
-                            style="text-4xl text-center font-bold text-gray-200"
-                            className=""
-                        >
+                        <Title as="h1" style="text-4xl text-center font-bold text-gray-200">
                             Words of Wonder
                         </Title>
 
