@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect } from 'react';
 import {
     ArrowPathIcon,
     InformationCircleIcon,
@@ -6,16 +6,16 @@ import {
     PaperAirplaneIcon,
     PlusIcon,
     // TrashIcon,
-} from "@heroicons/react/20/solid";
-import Button from "./Button";
-import Title from "./Title";
-import Grid from "./Grid";
-import useWOW from "../hooks/useWOW";
-import { columns, rows } from "../constants/game";
-import { generateGrid } from "../utils/generateGrid";
-import { ACTIONS } from "../constants/actions";
-import Loader from "./Loader";
-import { getRandomWords } from "../utils/getRandomWords";
+} from '@heroicons/react/20/solid';
+import Button from './Button';
+import Title from './Title';
+import Grid from './Grid';
+import useWOW from '../hooks/useWOW';
+import { columns, rows } from '../constants/game';
+import { generateGrid } from '../utils/generateGrid';
+import { ACTIONS } from '../constants/actions';
+import Loader from './Loader';
+import { getRandomWords } from '../utils/getRandomWords';
 
 function WordsOfWonder() {
     const { loading, dispatch, grid } = useWOW();
@@ -47,17 +47,17 @@ function WordsOfWonder() {
 
     const handleFinishGame = () => {
         dispatch({ type: ACTIONS.FINISH_GAME });
-        alert("🎉 Game Finished! Your progress is saved.");
+        alert('🎉 Game Finished! Your progress is saved.');
     };
 
     const handleNeedHelp = () => {
         dispatch({ type: ACTIONS.NEED_HELP });
-        alert("💡 Hint: Look carefully! One of your words is hidden diagonally 😉");
+        alert('💡 Hint: Look carefully! One of your words is hidden diagonally 😉');
     };
 
     return (
-        <div className="w-full h-dvh bg-gray-800 flex flex-col items-center justify-center">
-            <div className="flex items-center justify-center gap-10 px-4 mb-10">
+        <div className="flex h-dvh w-full flex-col items-center justify-center bg-gray-800">
+            <div className="mb-10 flex items-center justify-center gap-10 px-4">
                 <Title as="h1" style="text-4xl text-center font-bold text-gray-200" className="">
                     Words of Wonder
                 </Title>
@@ -70,7 +70,7 @@ function WordsOfWonder() {
                 ) : (
                     <>
                         <Grid grid={grid} />
-                        <div className="flex flex-col items-center justify-center gap-10 px-10 py-5 w-3/4">
+                        <div className="flex w-3/4 flex-col items-center justify-center gap-10 px-10 py-5">
                             <Button
                                 icon={<PlusIcon className="size-8" />}
                                 text="New Game"

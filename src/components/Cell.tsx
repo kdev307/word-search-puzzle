@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 type CellProps = {
     children?: React.ReactNode;
@@ -6,7 +6,7 @@ type CellProps = {
 
 function Cell({ children }: CellProps) {
     return (
-        <div className="p-5 min-w-18 border-2 rounded-2xl text-center text-2xl font-bold bg-gray-200 text-gray-900">
+        <div className="min-w-18 rounded-2xl border-2 bg-gray-200 p-5 text-center text-2xl font-bold text-gray-900">
             {children}
         </div>
     );
