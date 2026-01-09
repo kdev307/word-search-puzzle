@@ -18,7 +18,7 @@ import Loader from './Loader';
 import { getRandomWords } from '../utils/getRandomWords';
 
 function WordsOfWonder() {
-    const { loading, dispatch, grid } = useWOW();
+    const { loading, dispatch, grid, score } = useWOW();
 
     useEffect(() => {
         const selectedWords = getRandomWords((rows * columns) / 5);
@@ -57,33 +57,52 @@ function WordsOfWonder() {
 
     return (
         <div className="flex h-dvh w-full flex-col items-center justify-center bg-gray-800">
-            <div className="mb-10 flex items-center justify-center gap-10 px-4">
-                <Title as="h1" style="text-4xl text-center font-bold text-gray-200" className="">
-                    Words of Wonder
-                </Title>
+            {loading ? (
+                <Loader rows={rows} columns={columns} />
+            ) : (
+                <>
+                    <div className="flex items-center justify-center gap-10 px-4">
+                        <Title
+                            as="h1"
+                            style="text-4xl text-center font-bold text-gray-200"
+                            className=""
+                        >
+                            Words of Wonder
+                        </Title>
 
-                <InformationCircleIcon className="size-10 text-gray-200" />
-            </div>
-            <div className="flex items-center justify-evenly gap-10">
-                {loading ? (
-                    <Loader rows={rows} columns={columns} />
-                ) : (
-                    <>
-                        <Grid grid={grid} />
-                        <div className="flex w-3/4 flex-col items-center justify-center gap-10 px-10 py-5">
-                            <Button
-                                icon={<PlusIcon className="size-8" />}
-                                text="New Game"
-                                style="bg-gray-700 text-white w-full"
-                                onClick={handleNewGame}
-                            />
-                            <Button
-                                icon={<ArrowPathIcon className="size-8" />}
-                                text="Restart Game"
-                                style="bg-gray-700 text-white w-full"
-                                onClick={handleRestartGame}
-                            />
-                            {/* <Button
+                        <InformationCircleIcon className="size-10 text-gray-200" />
+                    </div>
+                    <div className="flex items-center justify-center gap-10">
+                        <Title as="h2" style="text-2xl text-center font-semibold text-gray-400">
+                            Score: {score}
+                        </Title>
+                        {/* <Title as="h2" style="text-2xl text-center font-semibold text-gray-400">
+          High Score: {score}
+        </Title> */}
+                        {/* <Title
+                as="h2"
+                style="text-2xl text-center font-semibold text-gray-400"
+              >
+                Timer: {timer}
+              </Title> */}
+                    </div>
+                    <div className="flex items-center justify-evenly gap-10">
+                        <>
+                            <Grid grid={grid} />
+                            <div className="flex w-3/4 flex-col items-center justify-center gap-10 px-10 py-5">
+                                <Button
+                                    icon={<PlusIcon className="size-8" />}
+                                    text="New Game"
+                                    style="bg-gray-700 text-white w-full"
+                                    onClick={handleNewGame}
+                                />
+                                <Button
+                                    icon={<ArrowPathIcon className="size-8" />}
+                                    text="Restart Game"
+                                    style="bg-gray-700 text-white w-full"
+                                    onClick={handleRestartGame}
+                                />
+                                {/* <Button
                                 icon={<ShieldCheckIcon className="size-8" />}
                                 text="Validate Word"
                                 style="bg-gray-700 text-white w-full"
@@ -95,22 +114,23 @@ function WordsOfWonder() {
                                 style="bg-gray-700 text-white w-full"
                                 onClick={() => alert("Clear")}
                                 /> */}
-                            <Button
-                                icon={<PaperAirplaneIcon className="size-8" />}
-                                text="Finish Game"
-                                style="bg-gray-700 text-white w-full"
-                                onClick={handleFinishGame}
-                            />
-                            <Button
-                                icon={<LightBulbIcon className="size-8" />}
-                                text="Need Help"
-                                style="bg-gray-700 text-white w-full"
-                                onClick={handleNeedHelp}
-                            />
-                        </div>
-                    </>
-                )}
-            </div>
+                                <Button
+                                    icon={<PaperAirplaneIcon className="size-8" />}
+                                    text="Finish Game"
+                                    style="bg-gray-700 text-white w-full"
+                                    onClick={handleFinishGame}
+                                />
+                                <Button
+                                    icon={<LightBulbIcon className="size-8" />}
+                                    text="Need Help"
+                                    style="bg-gray-700 text-white w-full"
+                                    onClick={handleNeedHelp}
+                                />
+                            </div>
+                        </>
+                    </div>
+                </>
+            )}
         </div>
     );
 }

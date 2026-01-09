@@ -7,11 +7,11 @@ interface TitleProps {
     className?: string;
 }
 
-function Title({ children, as, style = '', className = '', ...props }: TitleProps) {
+function Title({ children, as, style = '', ...props }: TitleProps) {
     const Element = as || 'h2';
 
     return (
-        <Element className={`py-4 ${style} ${className}`} {...props}>
+        <Element className={`py-4 ${style}`} {...props}>
             {children}
         </Element>
     );
