@@ -1,20 +1,20 @@
-import React from "react";
+import React from 'react';
 
 interface ButtonProps {
     style?: string;
     text?: string;
     onClick?: React.MouseEventHandler<HTMLButtonElement>;
     disabled?: boolean;
-    type?: "button" | "submit" | "reset";
+    type?: 'button' | 'submit' | 'reset';
     icon?: React.ReactNode;
 }
 
 function Button({
-    style = "",
-    text = "",
+    style = '',
+    text = '',
     onClick = () => {},
     disabled = false,
-    type = "button",
+    type = 'button',
     icon = null,
 }: ButtonProps) {
     return (
@@ -22,14 +22,10 @@ function Button({
             type={type}
             onClick={onClick}
             disabled={disabled}
-            className={`
-        text-xl py-4 px-6 font-medium rounded-full border-2 hover:bg-gray-100 hover:text-gray-800 
-        cursor-pointer w-full transition-colors duration-300 ease-in-out flex items-center justify-center gap-6
-        whitespace-nowrap ${style}
-      `}
+            className={`flex w-full cursor-pointer items-center justify-center gap-6 rounded-full border-2 px-6 py-4 text-xl font-medium whitespace-nowrap transition-colors duration-300 ease-in-out hover:bg-gray-100 hover:text-gray-800 ${style} `}
         >
             {text}
-            {icon && <span className="mr-2 ">{icon}</span>}
+            {icon && <span className="mr-2">{icon}</span>}
         </button>
     );
 }

@@ -1,6 +1,6 @@
-import Title from "./Title";
-import Grid from "./Grid";
-import { useLoader } from "../hooks/useLoader";
+import Title from './Title';
+import Grid from './Grid';
+import { useLoader } from '../hooks/useLoader';
 
 interface LoaderProps {
     rows: number;
