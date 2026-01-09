@@ -24,3 +24,19 @@ export function isStraightLine(
 
     return true;
 }
+
+export function getCellFromPointerEvent(
+    e: React.PointerEvent<HTMLElement>,
+): { row: number; col: number } | null {
+    const { clientX, clientY } = e;
+    const element = document.elementFromPoint(clientX, clientY);
+    if (!element) return null;
+
+    const cell = element.closest('[data-row][data-col]') as HTMLElement | null;
+    if (!cell) return null;
+
+    return {
+        row: Number(cell.dataset.row),
+        col: Number(cell.dataset.col),
+    };
+}
