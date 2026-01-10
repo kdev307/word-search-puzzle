@@ -8,7 +8,7 @@ interface WOWState {
     selectedCells: { row: number; col: number }[];
     currentWord: string;
     score: number;
-    foundWords: string[];
+    wordsFound: { word: string; cells: { row: number; col: number }[] }[];
     status: ActionType;
     loading: boolean;
 }
@@ -95,7 +95,7 @@ const initialState: WOWState = {
     currentWord: '',
     selectedCells: [],
     score: 0,
-    foundWords: [],
+    wordsFound: [],
     status: ACTIONS.READY_GAME,
     loading: true,
 };
@@ -156,11 +156,16 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
 
         case ACTIONS.END_SELECTION: {
             const isFound = state.words.includes(state.currentWord);
-            const isNewWord = isFound && !state.foundWords.includes(state.currentWord);
+            const isNewWord =
+                isFound && !state.wordsFound.some((fw) => fw.word === state.currentWord);
+
+            const foundedWordData = {
+                word: state.currentWord,
+                cells: state.selectedCells,
+            };
             return {
                 ...state,
-                foundWords: isNewWord ? [...state.foundWords, state.currentWord] : state.foundWords,
-                score: isNewWord ? state.score + 10 : state.score,
+                wordsFound: isNewWord ? [...state.wordsFound, foundedWordData] : state.wordsFound,
                 currentWord: '',
                 selectedCells: [],
             };
@@ -178,7 +183,7 @@ interface WOWProviderProps {
 
 function WOWProvider({ children }: WOWProviderProps) {
     const [
-        { grid, words, currentWord, selectedCells, score, foundWords, status, loading },
+        { grid, words, currentWord, selectedCells, score, wordsFound, status, loading },
         dispatch,
     ] = useReducer(wowReducer, initialState);
 
@@ -190,7 +195,7 @@ function WOWProvider({ children }: WOWProviderProps) {
                 currentWord,
                 selectedCells,
                 score,
-                foundWords,
+                wordsFound,
                 status,
                 loading,
                 dispatch,

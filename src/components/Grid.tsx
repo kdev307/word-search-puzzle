@@ -5,7 +5,7 @@ import Cell from './Cell';
 import { getCellFromPointerEvent, getDirection, isStraightLine } from '../utils/cellSelection';
 
 function Grid() {
-    const { grid, dispatch, selectedCells } = useWOW();
+    const { grid, dispatch, selectedCells, wordsFound } = useWOW();
     const [isSelecting, setIsSelecting] = useState<boolean>(false);
     const [startCell, setStartCell] = useState<{ row: number; col: number } | null>(null);
     const [direction, setDirection] = useState<{ dx: number; dy: number } | null>(null);
@@ -83,6 +83,14 @@ function Grid() {
     const isSelected = (row: number, col: number) =>
         selectedCells.some((c) => c.row === row && c.col === col);
 
+    const isFoundCell = (row: number, col: number): boolean =>
+        wordsFound.some(
+            (fw: { word: string; cells: { row: number; col: number }[] }) =>
+                fw.cells.some(
+                    (cell: { row: number; col: number }) => cell.row === row && cell.col === col,
+                ),
+        );
+
     return (
         <div
             className="grid gap-2 rounded-2xl border-2 bg-gray-400 p-4"
@@ -103,6 +111,7 @@ function Grid() {
                         data-row={rowIdx}
                         data-col={colIdx}
                         selected={isSelected(rowIdx, colIdx)}
+                        found={isFoundCell(rowIdx, colIdx)}
                     >
                         {letter}
                     </Cell>
