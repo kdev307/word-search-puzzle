@@ -14,7 +14,7 @@ interface WOWState {
     wordsFound: { word: string; cells: { row: number; col: number }[]; color: string }[];
     status: ActionType;
     loading: boolean;
-    colors: unknown | string[];
+    colors: string[];
 }
 
 interface LoadingAction {
@@ -171,11 +171,10 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
                 return { ...state, currentWord: '', selectedCells: [] };
             }
 
-            const color = generateColorPalette(state.wordsFound.length + 1).slice(-1)[0] as string;
             const foundedWordData = {
                 word: state.currentWord,
                 cells: state.selectedCells,
-                color,
+                color: state.colors[state.wordsFound.length % state.colors.length],
                 direction: getDirection(
                     state.selectedCells[0],
                     state.selectedCells[state.selectedCells.length - 1],

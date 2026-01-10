@@ -24,20 +24,16 @@ function hslToHex(h: number, s: number, l: number) {
     );
 }
 
-function getBrightColor() {
-    const hue = Math.floor(Math.random() * 360);
-    const saturation = 80;
-    const lightness = 40;
+export function generateColorPalette(count: number): string[] {
+    const colors = [];
 
-    return hslToHex(hue, saturation, lightness);
-}
+    for (let i = 0; i < count; i++) {
+        const hue = Math.floor((360 / count) * i);
+        const saturation = 80;
+        const lightness = 40;
 
-export function generateColorPalette(count: number) {
-    const colors = new Set();
-
-    while (colors.size < count) {
-        colors.add(getBrightColor());
+        colors.push(hslToHex(hue, saturation, lightness));
     }
 
-    return Array.from(colors);
+    return colors;
 }
