@@ -64,7 +64,7 @@ function WordsOfWonder() {
     };
 
     return (
-        <div className="flex h-dvh w-full flex-col items-center justify-center bg-gray-800">
+        <div className="h-100dvh flex w-full flex-col items-center justify-center bg-gray-800">
             {loading ? (
                 <Loader rows={rows} columns={columns} />
             ) : (
@@ -90,13 +90,13 @@ function WordsOfWonder() {
                 Timer: {timer}
               </Title> */}
                     </div>
-                    <div className="flex items-center justify-evenly gap-10">
+                    <div className="flex flex-col items-center justify-evenly gap-10">
                         <>
-                            <div className="flex items-center justify-center gap-10">
+                            <div className="flex items-start justify-center gap-10">
                                 <Grid />
                                 <FoundWords />
                             </div>
-                            <div className="flex w-3/4 flex-col items-center justify-center gap-10 px-10 py-5">
+                            <div className="flex w-3/4 items-center justify-center gap-10 px-10 py-5">
                                 <Button
                                     icon={<PlusIcon className="size-8" />}
                                     text="New Game"
