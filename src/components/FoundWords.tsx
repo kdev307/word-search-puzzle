@@ -9,16 +9,16 @@ function FoundWords() {
                 Words to Find ({wordsFound.length}/{words.length})
             </Title>
 
-            <ul className="grid w-full grid-cols-1 gap-3">
+            <ul className="scrollbar flex max-h-120 w-full flex-col gap-3 overflow-auto pr-3">
                 {words.map((word) => {
-                    const isFound = wordsFound.some(foundWord => foundWord.word === word);
+                    const isFound = wordsFound.some((found) => found.word === word);
                     return (
                         <li
                             key={word}
                             className={`rounded-xl px-4 py-2 text-center text-xl font-semibold transition-all duration-200 ${
                                 isFound
-                                    ? 'animate-pulse bg-gray-900 text-gray-100'
-                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-200 hover:text-gray-800'
+                                    ? 'cursor-not-allowed bg-gray-700 text-gray-300'
+                                    : 'bg-gray-900 text-gray-100 hover:bg-gray-200 hover:text-gray-800'
                             } `}
                         >
                             {word.toUpperCase()}
