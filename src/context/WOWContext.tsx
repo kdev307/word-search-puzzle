@@ -2,6 +2,8 @@ import { createContext, useEffect, useReducer } from 'react';
 import type { ReactNode, Dispatch } from 'react';
 import { ACTIONS, type ActionType } from '../constants/actions';
 import { clearSession, loadSession, saveSession } from '../utils/storage';
+import { generateColorPalette } from '../utils/generateColours';
+import { getDirection } from '../utils/cellSelection';
 
 interface WOWState {
     grid: string[][];
@@ -9,9 +11,10 @@ interface WOWState {
     selectedCells: { row: number; col: number }[];
     currentWord: string;
     score: number;
-    wordsFound: { word: string; cells: { row: number; col: number }[] }[];
+    wordsFound: { word: string; cells: { row: number; col: number }[]; color: string }[];
     status: ActionType;
     loading: boolean;
+    colors: unknown | string[];
 }
 
 interface LoadingAction {
@@ -96,6 +99,7 @@ const initialState: WOWState = {
     wordsFound: gameSession?.wordsFound ?? [],
     status: ACTIONS.READY_GAME,
     loading: false,
+    colors: gameSession?.colors ?? [],
 };
 
 function wowReducer(state: WOWState, action: WOWAction): WOWState {
@@ -110,6 +114,7 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
                 words: action.payload.words,
                 loading: false,
                 status: ACTIONS.READY_GAME,
+                colors: generateColorPalette(action.payload.words.length),
             };
 
         case ACTIONS.RESET_GAME:
@@ -162,9 +167,19 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
             const isNewWord =
                 isFound && !state.wordsFound.some((fw) => fw.word === state.currentWord);
 
+            if (!isFound) {
+                return { ...state, currentWord: '', selectedCells: [] };
+            }
+
+            const color = generateColorPalette(state.wordsFound.length + 1).slice(-1)[0] as string;
             const foundedWordData = {
                 word: state.currentWord,
                 cells: state.selectedCells,
+                color,
+                direction: getDirection(
+                    state.selectedCells[0],
+                    state.selectedCells[state.selectedCells.length - 1],
+                ),
             };
             return {
                 ...state,
@@ -186,7 +201,8 @@ interface WOWProviderProps {
 
 function WOWProvider({ children }: WOWProviderProps) {
     const [state, dispatch] = useReducer(wowReducer, initialState);
-    const { grid, words, currentWord, selectedCells, score, wordsFound, status, loading } = state;
+    const { grid, words, currentWord, selectedCells, score, wordsFound, status, loading, colors } =
+        state;
 
     useEffect(() => {
         if (!state.loading) {
@@ -210,6 +226,7 @@ function WOWProvider({ children }: WOWProviderProps) {
                 wordsFound,
                 status,
                 loading,
+                colors,
                 dispatch,
             }}
         >

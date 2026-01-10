@@ -96,7 +96,7 @@ function WordsOfWonder() {
                                 <Grid />
                                 <FoundWords />
                             </div>
-                            <div className="flex w-3/4 items-center justify-center gap-10 px-10 py-5">
+                            <div className="flex items-center justify-center gap-10 px-10 py-5">
                                 <Button
                                     icon={<PlusIcon className="size-8" />}
                                     text="New Game"
