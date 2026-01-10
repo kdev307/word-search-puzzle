@@ -16,6 +16,7 @@ import { generateGrid } from '../utils/generateGrid';
 import { ACTIONS } from '../constants/actions';
 import Loader from './Loader';
 import { getRandomWords } from '../utils/getRandomWords';
+import FoundWords from './FoundWords';
 
 function WordsOfWonder() {
     const { loading, dispatch, grid, score } = useWOW();
@@ -84,7 +85,10 @@ function WordsOfWonder() {
                     </div>
                     <div className="flex items-center justify-evenly gap-10">
                         <>
-                            <Grid grid={grid} />
+                            <div className="flex items-center justify-center gap-10">
+                                <Grid grid={grid} />
+                                <FoundWords />
+                            </div>
                             <div className="flex w-3/4 flex-col items-center justify-center gap-10 px-10 py-5">
                                 <Button
                                     icon={<PlusIcon className="size-8" />}
