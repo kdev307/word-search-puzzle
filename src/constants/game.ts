@@ -1,4 +1,6 @@
-export const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+export const GAME_SESSION_KEY = 'wowGameSession';
+
+export const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 export const rows = 6;
 export const columns = 6;
 
