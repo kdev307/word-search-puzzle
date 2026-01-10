@@ -1,6 +1,7 @@
-import { createContext, useReducer } from 'react';
+import { createContext, useEffect, useReducer } from 'react';
 import type { ReactNode, Dispatch } from 'react';
 import { ACTIONS, type ActionType } from '../constants/actions';
+import { clearSession, loadSession, saveSession } from '../utils/storage';
 
 interface WOWState {
     grid: string[][];
@@ -18,8 +19,8 @@ interface LoadingAction {
     payload: boolean;
 }
 
-interface InitGridAction {
-    type: typeof ACTIONS.INIT_GRID;
+interface NewGameAction {
+    type: typeof ACTIONS.NEW_GAME;
     payload: { grid: string[][]; words: string[] };
 }
 
@@ -50,10 +51,6 @@ interface ValidateWordAction {
     type: typeof ACTIONS.VALIDATE_WORD;
 }
 
-interface NewGameAction {
-    type: typeof ACTIONS.NEW_GAME;
-}
-
 interface ResetGameAction {
     type: typeof ACTIONS.RESET_GAME;
 }
@@ -72,7 +69,6 @@ interface NeedHelpAction {
 
 type WOWAction =
     | LoadingAction
-    | InitGridAction
     | SelectCellAction
     | ClearSelectionAction
     | StartSelectionAction
@@ -89,24 +85,27 @@ interface WOWContextType extends WOWState {
     dispatch: Dispatch<WOWAction>;
 }
 
+const gameSession = loadSession();
+
 const initialState: WOWState = {
-    grid: [],
-    words: [],
+    grid: gameSession?.grid ?? [],
+    words: gameSession?.words ?? [],
     currentWord: '',
     selectedCells: [],
-    score: 0,
-    wordsFound: [],
+    score: gameSession?.score ?? 0,
+    wordsFound: gameSession?.wordsFound ?? [],
     status: ACTIONS.READY_GAME,
-    loading: true,
+    loading: false,
 };
 
 function wowReducer(state: WOWState, action: WOWAction): WOWState {
     switch (action.type) {
         case ACTIONS.LOADING:
             return { ...state, loading: action.payload };
-        case ACTIONS.INIT_GRID:
+        case ACTIONS.NEW_GAME:
+            clearSession();
             return {
-                ...state,
+                ...initialState,
                 grid: action.payload.grid,
                 words: action.payload.words,
                 loading: false,
@@ -115,7 +114,11 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
 
         case ACTIONS.RESET_GAME:
             return {
-                ...initialState,
+                ...state,
+                wordsFound: [],
+                score: 0,
+                currentWord: '',
+                selectedCells: [],
                 loading: false,
                 status: ACTIONS.READY_GAME,
             };
@@ -182,10 +185,19 @@ interface WOWProviderProps {
 }
 
 function WOWProvider({ children }: WOWProviderProps) {
-    const [
-        { grid, words, currentWord, selectedCells, score, wordsFound, status, loading },
-        dispatch,
-    ] = useReducer(wowReducer, initialState);
+    const [state, dispatch] = useReducer(wowReducer, initialState);
+    const { grid, words, currentWord, selectedCells, score, wordsFound, status, loading } = state;
+
+    useEffect(() => {
+        if (!state.loading) {
+            saveSession({
+                grid: state.grid,
+                words: state.words,
+                wordsFound: state.wordsFound,
+                score: state.score,
+            });
+        }
+    }, [state.grid, state.words, state.wordsFound, state.score, state.loading]);
 
     return (
         <WOWContext.Provider

@@ -11,7 +11,7 @@ import Button from './Button';
 import Title from './Title';
 import Grid from './Grid';
 import useWOW from '../hooks/useWOW';
-import { columns, rows } from '../constants/game';
+import { columns, GAME_SESSION_KEY, rows } from '../constants/game';
 import { generateGrid } from '../utils/generateGrid';
 import { ACTIONS } from '../constants/actions';
 import Loader from './Loader';
@@ -22,9 +22,21 @@ function WordsOfWonder() {
     const { loading, dispatch, score } = useWOW();
 
     useEffect(() => {
-        const selectedWords = getRandomWords((rows * columns) / 5);
-        const { grid: wordGrid, words: wordsInGrid } = generateGrid(rows, columns, selectedWords);
-        dispatch({ type: ACTIONS.INIT_GRID, payload: { grid: wordGrid, words: wordsInGrid } });
+        dispatch({ type: ACTIONS.LOADING, payload: true });
+
+        const existingSession = sessionStorage.getItem(GAME_SESSION_KEY);
+
+        if (!existingSession) {
+            const selectedWords = getRandomWords((rows * columns) / 5);
+            const { grid, words } = generateGrid(rows, columns, selectedWords);
+
+            dispatch({
+                type: ACTIONS.NEW_GAME,
+                payload: { grid, words },
+            });
+        } else {
+            dispatch({ type: ACTIONS.LOADING, payload: false });
+        }
     }, [dispatch]);
 
     const handleNewGame = () => {
@@ -32,19 +44,13 @@ function WordsOfWonder() {
         const { grid: wordGrid, words: wordsInGrid } = generateGrid(rows, columns, selectedWords);
 
         dispatch({
-            type: ACTIONS.INIT_GRID,
+            type: ACTIONS.NEW_GAME,
             payload: { grid: wordGrid, words: wordsInGrid },
         });
     };
 
     const handleRestartGame = () => {
         dispatch({ type: ACTIONS.RESET_GAME });
-        const selectedWords = getRandomWords((rows * columns) / 5);
-        const { grid: wordGrid, words: wordsInGrid } = generateGrid(rows, columns, selectedWords);
-        dispatch({
-            type: ACTIONS.INIT_GRID,
-            payload: { grid: wordGrid, words: wordsInGrid },
-        });
     };
 
     const handleFinishGame = () => {
