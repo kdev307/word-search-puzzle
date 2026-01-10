@@ -19,30 +19,31 @@ import { getRandomWords } from '../utils/getRandomWords';
 import FoundWords from './FoundWords';
 
 function WordsOfWonder() {
-    const { loading, dispatch, grid, score } = useWOW();
+    const { loading, dispatch, score } = useWOW();
 
     useEffect(() => {
         const selectedWords = getRandomWords((rows * columns) / 5);
-        const newGrid = generateGrid(rows, columns, selectedWords);
-        dispatch({ type: ACTIONS.INIT_GRID, payload: { grid: newGrid, words: selectedWords } });
+        const { grid: wordGrid, words: wordsInGrid } = generateGrid(rows, columns, selectedWords);
+        dispatch({ type: ACTIONS.INIT_GRID, payload: { grid: wordGrid, words: wordsInGrid } });
     }, [dispatch]);
 
     const handleNewGame = () => {
         const selectedWords = getRandomWords((rows * columns) / 5);
-        const newGrid = generateGrid(rows, columns, selectedWords);
+        const { grid: wordGrid, words: wordsInGrid } = generateGrid(rows, columns, selectedWords);
+
         dispatch({
             type: ACTIONS.INIT_GRID,
-            payload: { grid: newGrid, words: selectedWords },
+            payload: { grid: wordGrid, words: wordsInGrid },
         });
     };
 
     const handleRestartGame = () => {
         dispatch({ type: ACTIONS.RESET_GAME });
         const selectedWords = getRandomWords((rows * columns) / 5);
-        const newGrid = generateGrid(rows, columns, selectedWords);
+        const { grid: wordGrid, words: wordsInGrid } = generateGrid(rows, columns, selectedWords);
         dispatch({
             type: ACTIONS.INIT_GRID,
-            payload: { grid: newGrid, words: selectedWords },
+            payload: { grid: wordGrid, words: wordsInGrid },
         });
     };
 
@@ -86,7 +87,7 @@ function WordsOfWonder() {
                     <div className="flex items-center justify-evenly gap-10">
                         <>
                             <div className="flex items-center justify-center gap-10">
-                                <Grid grid={grid} />
+                                <Grid />
                                 <FoundWords />
                             </div>
                             <div className="flex w-3/4 flex-col items-center justify-center gap-10 px-10 py-5">
