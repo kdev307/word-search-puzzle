@@ -19,7 +19,7 @@ import { getRandomWords } from '../utils/getRandomWords';
 import FoundWords from './FoundWords';
 
 function WordsOfWonder() {
-    const { loading, dispatch, score } = useWOW();
+    const { grid, loading, dispatch, score } = useWOW();
 
     useEffect(() => {
         dispatch({ type: ACTIONS.LOADING, payload: true });
@@ -93,7 +93,7 @@ function WordsOfWonder() {
                     <div className="flex flex-col items-center justify-evenly gap-10">
                         <>
                             <div className="flex items-start justify-center gap-10">
-                                <Grid />
+                                <Grid grid={grid} />
                                 <FoundWords />
                             </div>
                             <div className="flex items-center justify-center gap-10 px-10 py-5">

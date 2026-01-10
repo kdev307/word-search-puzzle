@@ -4,8 +4,8 @@ import useWOW from '../hooks/useWOW';
 import Cell from './Cell';
 import { getCellFromPointerEvent, getDirection, isStraightLine } from '../utils/cellSelection';
 
-function Grid() {
-    const { grid, dispatch, selectedCells, wordsFound } = useWOW();
+function Grid({ grid }: { grid: string[][] }) {
+    const { dispatch, selectedCells, wordsFound } = useWOW();
     const [isSelecting, setIsSelecting] = useState<boolean>(false);
     const [startCell, setStartCell] = useState<{ row: number; col: number } | null>(null);
     const [direction, setDirection] = useState<{ dx: number; dy: number } | null>(null);
