@@ -1,12 +1,5 @@
-import { useEffect } from 'react';
-import {
-    ArrowPathIcon,
-    InformationCircleIcon,
-    LightBulbIcon,
-    PaperAirplaneIcon,
-    PlusIcon,
-    // TrashIcon,
-} from '@heroicons/react/20/solid';
+import { useState, useEffect } from 'react';
+import { ArrowPathIcon, InformationCircleIcon, PlusIcon } from '@heroicons/react/20/solid';
 import Button from './Button';
 import Title from './Title';
 import Grid from './Grid';
@@ -17,9 +10,21 @@ import { ACTIONS } from '../constants/actions';
 import Loader from './Loader';
 import { getRandomWords } from '../utils/getRandomWords';
 import FoundWords from './FoundWords';
+import Modal from './Modal';
+import GameInformation from './GameInformation';
+import { formatTime } from '../utils/formatTime';
+import Result from './Result';
+import { backgroundCelebration, blastCelebration, stopAllConfetti } from '../utils/celebrations';
 
 function WordsOfWonder() {
-    const { grid, loading, dispatch, score } = useWOW();
+    const { grid, loading, dispatch, score, timeTaken, words, wordsFound } = useWOW();
+    const [modal, setModal] = useState<{
+        open: boolean;
+        type: 'info' | 'result' | null;
+    }>({
+        open: false,
+        type: null,
+    });
 
     useEffect(() => {
         dispatch({ type: ACTIONS.LOADING, payload: true });
@@ -27,7 +32,7 @@ function WordsOfWonder() {
         const existingSession = sessionStorage.getItem(GAME_SESSION_KEY);
 
         if (!existingSession) {
-            const selectedWords = getRandomWords((rows * columns) / 5);
+            const selectedWords = getRandomWords((rows * columns) / 7);
             const { grid, words } = generateGrid(rows, columns, selectedWords);
 
             dispatch({
@@ -39,8 +44,21 @@ function WordsOfWonder() {
         }
     }, [dispatch]);
 
+    useEffect(() => {
+        if (!words || !wordsFound) return;
+        if (words.length > 0 && wordsFound.length === words.length) {
+            dispatch({ type: ACTIONS.FINISH_GAME });
+            setModal({ open: true, type: 'result' });
+            stopAllConfetti();
+            backgroundCelebration();
+            blastCelebration();
+        }
+    }, [dispatch, wordsFound, words]);
+
     const handleNewGame = () => {
-        const selectedWords = getRandomWords((rows * columns) / 5);
+        stopAllConfetti();
+        setModal({ open: false, type: null });
+        const selectedWords = getRandomWords((rows * columns) / 7);
         const { grid: wordGrid, words: wordsInGrid } = generateGrid(rows, columns, selectedWords);
 
         dispatch({
@@ -50,21 +68,13 @@ function WordsOfWonder() {
     };
 
     const handleRestartGame = () => {
+        stopAllConfetti();
+        setModal({ open: false, type: null });
         dispatch({ type: ACTIONS.RESET_GAME });
     };
 
-    const handleFinishGame = () => {
-        dispatch({ type: ACTIONS.FINISH_GAME });
-        alert('🎉 Game Finished! Your progress is saved.');
-    };
-
-    const handleNeedHelp = () => {
-        dispatch({ type: ACTIONS.NEED_HELP });
-        alert('💡 Hint: Look carefully! One of your words is hidden diagonally 😉');
-    };
-
     return (
-        <div className="h-100dvh flex w-full flex-col items-center justify-center bg-gray-800">
+        <div className="flex h-full w-full flex-col items-center justify-center bg-gray-800">
             {loading ? (
                 <Loader rows={rows} columns={columns} />
             ) : (
@@ -73,30 +83,34 @@ function WordsOfWonder() {
                         <Title as="h1" style="text-4xl text-center font-bold text-gray-200">
                             Words of Wonder
                         </Title>
-
-                        <InformationCircleIcon className="size-10 text-gray-200" />
+                        <>
+                            <InformationCircleIcon
+                                className="size-10 cursor-pointer text-gray-200"
+                                onClick={() => setModal({ open: true, type: 'info' })}
+                            />
+                            <Modal
+                                isOpen={modal.open && modal.type === 'info'}
+                                onClose={() => setModal({ open: false, type: null })}
+                            >
+                                <GameInformation />
+                            </Modal>
+                        </>
                     </div>
                     <div className="flex items-center justify-center gap-10">
                         <Title as="h2" style="text-2xl text-center font-semibold text-gray-400">
                             Score: {score}
                         </Title>
-                        {/* <Title as="h2" style="text-2xl text-center font-semibold text-gray-400">
-          High Score: {score}
-        </Title> */}
-                        {/* <Title
-                as="h2"
-                style="text-2xl text-center font-semibold text-gray-400"
-              >
-                Timer: {timer}
-              </Title> */}
+
+                        <Title as="h2" style="text-2xl text-center font-semibold text-gray-400">
+                            Time: {formatTime(timeTaken)}
+                        </Title>
                     </div>
-                    <div className="flex flex-col items-center justify-evenly gap-10">
-                        <>
-                            <div className="flex items-start justify-center gap-10">
-                                <Grid grid={grid} />
-                                <FoundWords />
-                            </div>
-                            <div className="flex items-center justify-center gap-10 px-10 py-5">
+                    <div className="flex items-start justify-center gap-10">
+                        <div className="rounded-2xl bg-gray-600 p-2">
+                            <Grid grid={grid} />
+                        </div>
+                        <div className="flex w-full flex-col items-center justify-center gap-5">
+                            <div className="flex w-full items-center justify-center gap-10">
                                 <Button
                                     icon={<PlusIcon className="size-8" />}
                                     text="New Game"
@@ -109,33 +123,19 @@ function WordsOfWonder() {
                                     style="bg-gray-700 text-white w-full"
                                     onClick={handleRestartGame}
                                 />
-                                {/* <Button
-                                icon={<ShieldCheckIcon className="size-8" />}
-                                text="Validate Word"
-                                style="bg-gray-700 text-white w-full"
-                                onClick={() => alert("Validate")}
-                                />
-                                <Button
-                                icon={<TrashIcon className="size-8" />}
-                                text="Clear Selection"
-                                style="bg-gray-700 text-white w-full"
-                                onClick={() => alert("Clear")}
-                                /> */}
-                                <Button
-                                    icon={<PaperAirplaneIcon className="size-8" />}
-                                    text="Finish Game"
-                                    style="bg-gray-700 text-white w-full"
-                                    onClick={handleFinishGame}
-                                />
-                                <Button
-                                    icon={<LightBulbIcon className="size-8" />}
-                                    text="Need Help"
-                                    style="bg-gray-700 text-white w-full"
-                                    onClick={handleNeedHelp}
-                                />
                             </div>
-                        </>
+                            <FoundWords />
+                        </div>
                     </div>
+                    <Modal
+                        isOpen={modal.open && modal.type === 'result'}
+                        onClose={() => setModal({ open: false, type: null })}
+                    >
+                        <Result
+                            onHandleNewGame={handleNewGame}
+                            onHandleRestartGame={handleRestartGame}
+                        />
+                    </Modal>
                 </>
             )}
         </div>

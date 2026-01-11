@@ -15,6 +15,8 @@ interface WOWState {
     status: ActionType;
     loading: boolean;
     colors: string[];
+    startTime: number | null;
+    timeTaken: number;
 }
 
 interface LoadingAction {
@@ -70,6 +72,15 @@ interface NeedHelpAction {
     type: typeof ACTIONS.NEED_HELP;
 }
 
+interface StartTimerAction {
+    type: typeof ACTIONS.START_TIMER;
+}
+
+interface TickAction {
+    type: typeof ACTIONS.TICK;
+    payload: number;
+}
+
 type WOWAction =
     | LoadingAction
     | SelectCellAction
@@ -82,7 +93,9 @@ type WOWAction =
     | ResetGameAction
     | ReadyGameAction
     | FinishGameAction
-    | NeedHelpAction;
+    | NeedHelpAction
+    | StartTimerAction
+    | TickAction;
 
 interface WOWContextType extends WOWState {
     dispatch: Dispatch<WOWAction>;
@@ -100,6 +113,8 @@ const initialState: WOWState = {
     status: ACTIONS.READY_GAME,
     loading: false,
     colors: gameSession?.colors ?? [],
+    startTime: null,
+    timeTaken: 0,
 };
 
 function wowReducer(state: WOWState, action: WOWAction): WOWState {
@@ -115,6 +130,8 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
                 loading: false,
                 status: ACTIONS.READY_GAME,
                 colors: generateColorPalette(action.payload.words.length),
+                startTime: Date.now(),
+                timeTaken: 0,
             };
 
         case ACTIONS.RESET_GAME:
@@ -126,12 +143,15 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
                 selectedCells: [],
                 loading: false,
                 status: ACTIONS.READY_GAME,
+                startTime: Date.now(),
+                timeTaken: 0,
             };
 
         case ACTIONS.FINISH_GAME:
             return {
                 ...state,
                 status: ACTIONS.FINISH_GAME,
+                timeTaken: state.startTime ? Math.floor((Date.now() - state.startTime) / 1000) : 0,
             };
 
         case ACTIONS.NEED_HELP:
@@ -187,6 +207,12 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
                 selectedCells: [],
             };
         }
+        case ACTIONS.START_TIMER:
+            return { ...state, startTime: Date.now(), timeTaken: 0 };
+
+        case ACTIONS.TICK:
+            return { ...state, timeTaken: action.payload };
+
         default:
             throw new Error('Unknown Action');
     }
@@ -200,8 +226,18 @@ interface WOWProviderProps {
 
 function WOWProvider({ children }: WOWProviderProps) {
     const [state, dispatch] = useReducer(wowReducer, initialState);
-    const { grid, words, currentWord, selectedCells, score, wordsFound, status, loading, colors } =
-        state;
+    const {
+        grid,
+        words,
+        currentWord,
+        selectedCells,
+        score,
+        wordsFound,
+        status,
+        loading,
+        colors,
+        timeTaken,
+    } = state;
 
     useEffect(() => {
         if (!state.loading) {
@@ -213,6 +249,19 @@ function WOWProvider({ children }: WOWProviderProps) {
             });
         }
     }, [state.grid, state.words, state.wordsFound, state.score, state.loading]);
+
+    useEffect(() => {
+        if (!state.startTime || status === ACTIONS.FINISH_GAME) return;
+
+        const interval = setInterval(() => {
+            dispatch({
+                type: ACTIONS.TICK,
+                payload: state.startTime ? Math.floor((Date.now() - state.startTime) / 1000) : 0,
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [status, state.startTime, dispatch]);
 
     return (
         <WOWContext.Provider
@@ -226,6 +275,8 @@ function WOWProvider({ children }: WOWProviderProps) {
                 status,
                 loading,
                 colors,
+                timeTaken,
+                startTime: state.startTime,
                 dispatch,
             }}
         >
