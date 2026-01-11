@@ -2,8 +2,12 @@ import { DIRECTIONS } from '../constants/game';
 import { generateGridLetters } from './generateGridLetter';
 import { canPlaceWord, placeWord } from './wordPlacement';
 
+export function initializeGrid(rows: number, columns: number) {
+    return Array.from({ length: rows }, () => Array.from({ length: columns }, () => ''));
+}
+
 export function generateGrid(rows: number, columns: number, words: string[] = []) {
-    const grid = Array.from({ length: rows }, () => Array.from({ length: columns }, () => ''));
+    const grid = initializeGrid(rows, columns);
 
     const wordsInGrid = [];
 
