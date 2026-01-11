@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { XCircleIcon } from '@heroicons/react/24/solid';
+import { stopAllConfetti } from '../utils/celebrations';
 
 interface ModalProps {
     isOpen: boolean;
@@ -22,16 +23,21 @@ function Modal({ isOpen, onClose, children }: ModalProps) {
 
     if (!isOpen) return null;
 
+    const handleClose = () => {
+        stopAllConfetti();
+        onClose();
+    };
+
     return createPortal(
         <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs"
-            onClick={onClose}
+            onClick={handleClose}
         >
             <div
                 className="relative mx-4 w-full max-w-4xl rounded-2xl bg-gray-300 p-6 shadow-xl"
                 onClick={(e) => e.stopPropagation()}
             >
-                <button className="absolute top-4 right-4 cursor-pointer" onClick={onClose}>
+                <button className="absolute top-4 right-4 cursor-pointer" onClick={handleClose}>
                     <XCircleIcon className="size-8 font-bold text-gray-800 transition hover:text-gray-600" />
                 </button>
                 {children}
