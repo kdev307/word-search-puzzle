@@ -1,7 +1,8 @@
-import { ArrowPathIcon, PlusIcon } from '@heroicons/react/20/solid';
+import { ArrowPathIcon, PlusIcon, SparklesIcon, TrophyIcon } from '@heroicons/react/20/solid';
 import Button from './Button';
 import Title from './Title';
 import useWOW from '../hooks/useWOW';
+import { formatTime } from '../utils/formatTime';
 
 interface ResultProps {
     onHandleNewGame: () => void;
@@ -9,12 +10,18 @@ interface ResultProps {
 }
 
 function Result({ onHandleNewGame, onHandleRestartGame }: ResultProps) {
-    const { score, time, words } = useWOW();
+    const { score, timeTaken, words } = useWOW();
     return (
         <div className="flex flex-col items-center justify-center gap-6">
-            <Title as="h2" style="text-3xl font-bold mb-3 text-center text-gray-900 animate-pulse">
-                Congratulations!
-            </Title>
+            <div className="flex items-center justify-center gap-6">
+                <SparklesIcon className="size-10 animate-bounce" />
+                <TrophyIcon className="size-10 animate-ping" />
+                <Title as="h2" style="text-3xl font-bold text-center text-gray-900 animate-pulse">
+                    Congratulations
+                </Title>
+                <TrophyIcon className="size-10 animate-ping" />
+                <SparklesIcon className="size-10 animate-bounce" />
+            </div>
             <p className="text-lg text-gray-700">You found all the words.</p>
             <div className="flex items-center justify-center gap-32">
                 <Title
@@ -27,7 +34,7 @@ function Result({ onHandleNewGame, onHandleRestartGame }: ResultProps) {
                     as="h3"
                     style="text-xl font-semibold mb-3 text-center text-gray-800 !normal-case "
                 >
-                    Time taken: {time}
+                    Time taken: {formatTime(timeTaken)}
                 </Title>
                 <Title
                     as="h3"

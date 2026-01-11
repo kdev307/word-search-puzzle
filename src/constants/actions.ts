@@ -11,6 +11,8 @@ export const ACTIONS = {
     READY_GAME: 'READY_GAME',
     FINISH_GAME: 'FINISH_GAME',
     NEED_HELP: 'NEED_HELP',
+    START_TIMER: 'START_TIMER',
+    TICK: 'TICK',
 } as const;
 
 export type ActionType = (typeof ACTIONS)[keyof typeof ACTIONS];

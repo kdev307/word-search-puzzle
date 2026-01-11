@@ -12,9 +12,10 @@ import { getRandomWords } from '../utils/getRandomWords';
 import FoundWords from './FoundWords';
 import Modal from './Modal';
 import GameInformation from './GameInformation';
+import { formatTime } from '../utils/formatTime';
 
 function WordsOfWonder() {
-    const { grid, loading, dispatch, score } = useWOW();
+    const { grid, loading, dispatch, score, timeTaken } = useWOW();
     const [open, setOpen] = useState<boolean>(false);
 
     useEffect(() => {
@@ -73,15 +74,10 @@ function WordsOfWonder() {
                         <Title as="h2" style="text-2xl text-center font-semibold text-gray-400">
                             Score: {score}
                         </Title>
-                        {/* <Title as="h2" style="text-2xl text-center font-semibold text-gray-400">
-          High Score: {score}
-        </Title> */}
-                        {/* <Title
-                as="h2"
-                style="text-2xl text-center font-semibold text-gray-400"
-              >
-                Timer: {timer}
-              </Title> */}
+
+                        <Title as="h2" style="text-2xl text-center font-semibold text-gray-400">
+                            Time: {formatTime(timeTaken)}
+                        </Title>
                     </div>
                     <div className="flex items-center justify-center gap-10">
                         <>
