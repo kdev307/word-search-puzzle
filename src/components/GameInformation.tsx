@@ -83,7 +83,7 @@ function GameInformation() {
                         </li>
                         <li>
                             <strong>Hint Reveal:</strong> Word uncovered by hint →{' '}
-                            <strong>earns 5 points </strong>.
+                            <strong>cost 5 points </strong>.
                         </li>
                         <li>
                             You can only claim points for words you personally find (not

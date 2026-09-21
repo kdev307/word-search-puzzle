@@ -26,7 +26,7 @@ export function generateGrid(rows: number, columns: number, words: string[] = []
                 wordsInGrid.push({
                     word: word,
                     startingCoord: [row, col],
-                    direction: [dx, dy],
+                    direction: { dx, dy },
                 });
                 console.log(`✅ Placed word: ${word} at (${row},${col}) dir [${dx},${dy}]`);
             }

@@ -1,7 +1,9 @@
+import { toast } from 'react-toastify';
 import { ACTIONS } from '../constants/actions';
 import useWOW from '../hooks/useWOW';
 import type { Word } from '../types';
 import Title from './Title';
+import ToastHint from './ToastHint';
 
 function FoundWords() {
     const { words, wordsFound } = useWOW();
@@ -31,8 +33,19 @@ function Word({ word, isFound }: WordProps) {
     const { dispatch } = useWOW();
     const handleHint = () => {
         dispatch({ type: ACTIONS.NEED_HELP, payload: word });
-        alert(
-            `💡 Hint ! Look carefully → ${word?.word} at [${word?.startingCoord}] in the direction [${word?.direction}] 😉`,
+        toast.info(
+            <ToastHint
+                word={word.word}
+                startingCoord={word.startingCoord}
+                direction={word.direction}
+            />,
+            {
+                className: 'w-full rounded-xl',
+                icon: false,
+                autoClose: 3000,
+                closeOnClick: true,
+                hideProgressBar: true,
+            },
         );
     };
     return (
