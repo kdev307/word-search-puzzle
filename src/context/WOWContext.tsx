@@ -102,7 +102,7 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
             const foundedWordData = {
                 word: state.currentWord,
                 cells: state.selectedCells,
-                color: state.colors[Math.floor(Math.random() * state.colors.length)],
+                color: state.colors[state.wordsFound.length % state.colors.length],
                 direction: getDirection(
                     state.selectedCells[0],
                     state.selectedCells[state.selectedCells.length - 1],
