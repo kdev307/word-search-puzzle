@@ -1,11 +1,7 @@
 import { GAME_SESSION_KEY } from '../constants/game';
+import type { GameState } from '../types';
 
-interface GameState {
-    grid: string[][];
-    words: string[];
-    wordsFound: { word: string; cells: { row: number; col: number }[] }[];
-    score: number;
-}
+
 
 export function saveSession(state: GameState) {
     try {

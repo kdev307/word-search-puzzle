@@ -1,105 +1,12 @@
 import { createContext, useEffect, useReducer } from 'react';
-import type { ReactNode, Dispatch } from 'react';
-import { ACTIONS, type ActionType } from '../constants/actions';
+import type { ReactNode } from 'react';
+import { ACTIONS } from '../constants/actions';
 import { clearSession, loadSession, saveSession } from '../utils/storage';
 import { generateColorPalette } from '../utils/generateColours';
 import { getDirection } from '../utils/cellSelection';
+// import type { Cell, FoundWord, Grid, Word } from '../types';
 
-interface WOWState {
-    grid: string[][];
-    words: string[];
-    selectedCells: { row: number; col: number }[];
-    currentWord: string;
-    score: number;
-    wordsFound: { word: string; cells: { row: number; col: number }[]; color: string }[];
-    status: ActionType;
-    loading: boolean;
-    colors: string[];
-    startTime: number | null;
-    timeTaken: number;
-}
-
-interface LoadingAction {
-    type: typeof ACTIONS.LOADING;
-    payload: boolean;
-}
-
-interface NewGameAction {
-    type: typeof ACTIONS.NEW_GAME;
-    payload: { grid: string[][]; words: string[] };
-}
-
-interface SelectCellAction {
-    type: typeof ACTIONS.SELECT_CELL;
-    payload: { row: number; col: number };
-}
-
-interface ClearSelectionAction {
-    type: typeof ACTIONS.CLEAR_SELECTION;
-}
-
-interface StartSelectionAction {
-    type: typeof ACTIONS.START_SELECTION;
-    payload: { row: number; col: number };
-}
-
-interface ExtendSelectionAction {
-    type: typeof ACTIONS.EXTEND_SELECTION;
-    payload: { row: number; col: number };
-}
-
-interface EndSelectionAction {
-    type: typeof ACTIONS.END_SELECTION;
-}
-
-interface ValidateWordAction {
-    type: typeof ACTIONS.VALIDATE_WORD;
-}
-
-interface ResetGameAction {
-    type: typeof ACTIONS.RESET_GAME;
-}
-
-interface ReadyGameAction {
-    type: typeof ACTIONS.READY_GAME;
-}
-
-interface FinishGameAction {
-    type: typeof ACTIONS.FINISH_GAME;
-}
-
-interface NeedHelpAction {
-    type: typeof ACTIONS.NEED_HELP;
-}
-
-interface StartTimerAction {
-    type: typeof ACTIONS.START_TIMER;
-}
-
-interface TickAction {
-    type: typeof ACTIONS.TICK;
-    payload: number;
-}
-
-type WOWAction =
-    | LoadingAction
-    | SelectCellAction
-    | ClearSelectionAction
-    | StartSelectionAction
-    | ExtendSelectionAction
-    | EndSelectionAction
-    | ValidateWordAction
-    | NewGameAction
-    | ResetGameAction
-    | ReadyGameAction
-    | FinishGameAction
-    | NeedHelpAction
-    | StartTimerAction
-    | TickAction;
-
-interface WOWContextType extends WOWState {
-    dispatch: Dispatch<WOWAction>;
-}
+import type { WOWAction, WOWContextType, WOWState } from '../types';
 
 const gameSession = loadSession();
 
@@ -157,7 +64,8 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
         case ACTIONS.NEED_HELP:
             return {
                 ...state,
-                status: ACTIONS.NEED_HELP,
+                score: state.score - 5,
+                // wordsFound: [...state.wordsFound, action.payload],
             };
 
         case ACTIONS.START_SELECTION:
@@ -183,7 +91,7 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
         }
 
         case ACTIONS.END_SELECTION: {
-            const isFound = state.words.includes(state.currentWord);
+            const isFound = state.words.some((word) => word.word === state.currentWord);
             const isNewWord =
                 isFound && !state.wordsFound.some((fw) => fw.word === state.currentWord);
 
@@ -194,7 +102,7 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
             const foundedWordData = {
                 word: state.currentWord,
                 cells: state.selectedCells,
-                color: state.colors[state.wordsFound.length % state.colors.length],
+                color: state.colors[Math.floor(Math.random() * state.colors.length)],
                 direction: getDirection(
                     state.selectedCells[0],
                     state.selectedCells[state.selectedCells.length - 1],
@@ -203,6 +111,7 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
             return {
                 ...state,
                 wordsFound: isNewWord ? [...state.wordsFound, foundedWordData] : state.wordsFound,
+                score: isNewWord ? state.score + 10 : state.score,
                 currentWord: '',
                 selectedCells: [],
             };

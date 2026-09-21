@@ -40,7 +40,7 @@ function Result({ onHandleNewGame, onHandleRestartGame }: ResultProps) {
                     as="h3"
                     style="text-xl font-semibold mb-3 text-center text-gray-800 !normal-case "
                 >
-                    Hints used: {words.length - score / 10}
+                    Hints used: {(words.length * 10 - score) / 5}
                 </Title>
             </div>
             <div className="flex items-center justify-center gap-20">
