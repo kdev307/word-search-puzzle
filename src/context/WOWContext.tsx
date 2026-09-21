@@ -19,6 +19,8 @@ const initialState: WOWState = {
     currentWord: '',
     selectedCells: [],
     score: gameSession?.score ?? 0,
+    hintsUsed: gameSession?.hintsUsed ?? 0,
+    solutionsRevealed: gameSession?.solutionsRevealed ?? 0,
     wordsFound: gameSession?.wordsFound ?? [],
     status: ACTIONS.READY_GAME,
     loading: false,
@@ -38,6 +40,8 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
                 grid: action.payload.grid,
                 words: action.payload.words,
                 score: 0,
+                hintsUsed: 0,
+                solutionsRevealed: 0,
                 loading: false,
                 wordsFound: [],
                 colors: generateColorPalette(action.payload.words.length),
@@ -50,6 +54,8 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
                 ...state,
                 wordsFound: [],
                 score: 0,
+                hintsUsed: 0,
+                solutionsRevealed: 0,
                 currentWord: '',
                 selectedCells: [],
                 loading: false,
@@ -69,6 +75,7 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
             return {
                 ...state,
                 score: state.score - GAME_SCORE.HINT_USED_PENALTY,
+                hintsUsed: state.hintsUsed + 1,
                 // wordsFound: [...state.wordsFound, action.payload],
             };
 
@@ -94,6 +101,7 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
                 ...state,
                 wordsFound: [...state.wordsFound, newEntry],
                 score: state.score - GAME_SCORE.SOLUTION_REVEALED_PENALTY,
+                solutionsRevealed: state.solutionsRevealed + 1,
             };
         }
 
@@ -170,6 +178,8 @@ function WOWProvider({ children }: WOWProviderProps) {
         currentWord,
         selectedCells,
         score,
+        hintsUsed,
+        solutionsRevealed,
         wordsFound,
         status,
         loading,
@@ -179,14 +189,9 @@ function WOWProvider({ children }: WOWProviderProps) {
 
     useEffect(() => {
         if (!state.loading) {
-            saveSession({
-                grid: state.grid,
-                words: state.words,
-                wordsFound: state.wordsFound,
-                score: state.score,
-            });
+            saveSession(state);
         }
-    }, [state.grid, state.words, state.wordsFound, state.score, state.loading]);
+    }, [state]);
 
     useEffect(() => {
         if (!state.startTime || status === ACTIONS.FINISH_GAME) return;
@@ -209,6 +214,8 @@ function WOWProvider({ children }: WOWProviderProps) {
                 currentWord,
                 selectedCells,
                 score,
+                hintsUsed,
+                solutionsRevealed,
                 wordsFound,
                 status,
                 loading,

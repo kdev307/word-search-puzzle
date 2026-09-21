@@ -44,6 +44,8 @@ export interface WOWState {
     currentWord: string;
     score: number;
     wordsFound: FoundWord[];
+    hintsUsed: number;
+    solutionsRevealed: number;
     status: ActionType;
     loading: boolean;
     colors: string[];
@@ -56,6 +58,8 @@ export interface GameState {
     words: Word[];
     wordsFound: FoundWord[];
     score: number;
+    hintsUsed: number,
+    solutionsRevealed: number
 }
 
 export interface LoadingAction {

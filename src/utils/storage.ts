@@ -5,10 +5,18 @@ import type { GameState } from '../types';
 
 export function saveSession(state: GameState) {
     try {
-        const { grid, words, wordsFound, score } = state;
+        const { grid, words, wordsFound, score, hintsUsed, solutionsRevealed } =
+            state;
         sessionStorage.setItem(
             GAME_SESSION_KEY,
-            JSON.stringify({ grid, words, wordsFound, score }),
+            JSON.stringify({
+                grid,
+                words,
+                wordsFound,
+                score,
+                hintsUsed,
+                solutionsRevealed,
+            })
         );
     } catch (err) {
         console.error('Error saving session data:', err);
