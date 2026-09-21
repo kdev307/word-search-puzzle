@@ -8,7 +8,7 @@ function App() {
             <WOWProvider>
                 <WordsOfWonder />
 
-                <ToastContainer position="top-center" theme="dark" />
+                <ToastContainer position="top-right" theme="dark" />
             </WOWProvider>
         </>
     );

@@ -6,6 +6,8 @@ import ToastHint from './ToastHint';
 import { useRef } from 'react';
 import { ACTIONS } from '../constants/actions';
 
+import { FaceFrownIcon } from '@heroicons/react/24/solid';
+
 function FoundWords() {
     const { words, wordsFound } = useWOW();
 
@@ -47,7 +49,6 @@ function Word({ word, isFound }: WordProps) {
                 icon: false,
                 autoClose: 3000,
                 closeOnClick: true,
-                hideProgressBar: true,
             },
         );
     };
@@ -55,9 +56,12 @@ function Word({ word, isFound }: WordProps) {
     const handleFindWord = () => {
         dispatch({ type: ACTIONS.REVEAL_SOLUTION, payload: word });
 
-        toast.info(
-            <div className="rounded-xl bg-white px-4 py-2 font-mono text-lg font-bold text-gray-900">
-                Highlighting Word: {word.word.toUpperCase()}!
+        toast.error(
+            <div className="flex items-center justify-center gap-3 rounded-xl bg-white px-4 py-2 font-mono text-lg font-bold text-gray-900">
+                <FaceFrownIcon className="size-8 text-gray-900" />
+                <span>Missed:</span>
+                <span>{word.word.toUpperCase()}</span>
+                <span className="opacity-60">(-10 pts)</span>
             </div>,
             {
                 autoClose: 2000,
