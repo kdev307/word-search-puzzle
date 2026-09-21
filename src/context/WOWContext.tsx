@@ -8,6 +8,9 @@ import { getDirection } from '../utils/cellSelection';
 
 import type { WOWAction, WOWContextType, WOWState } from '../types';
 
+import { GAME_SCORE } from '../constants/game';
+import { findWord } from '../utils/findWord';
+
 const gameSession = loadSession();
 
 const initialState: WOWState = {
@@ -34,8 +37,9 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
                 ...initialState,
                 grid: action.payload.grid,
                 words: action.payload.words,
+                score: 0,
                 loading: false,
-                status: ACTIONS.READY_GAME,
+                wordsFound: [],
                 colors: generateColorPalette(action.payload.words.length),
                 startTime: Date.now(),
                 timeTaken: 0,
@@ -64,9 +68,34 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
         case ACTIONS.NEED_HELP:
             return {
                 ...state,
-                score: state.score - 5,
+                score: state.score - GAME_SCORE.HINT_USED_PENALTY,
                 // wordsFound: [...state.wordsFound, action.payload],
             };
+
+        case ACTIONS.REVEAL_SOLUTION: {
+            const result = findWord(state.grid, action.payload.word);
+
+            if (!result) {
+                console.warn('Word not found in grid:', action.payload.word);
+                return state;
+            }
+
+            const { path, direction } = result;
+
+            const newEntry = {
+                word: action.payload.word,
+                cells: path,
+                direction,
+                color: state.colors[state.wordsFound.length % state.colors.length],
+                revealed: true,
+            };
+
+            return {
+                ...state,
+                wordsFound: [...state.wordsFound, newEntry],
+                score: state.score - GAME_SCORE.SOLUTION_REVEALED_PENALTY,
+            };
+        }
 
         case ACTIONS.START_SELECTION:
             return {
@@ -111,7 +140,7 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
             return {
                 ...state,
                 wordsFound: isNewWord ? [...state.wordsFound, foundedWordData] : state.wordsFound,
-                score: isNewWord ? state.score + 10 : state.score,
+                score: isNewWord ? state.score + GAME_SCORE.WORD_FOUND_REWARD : state.score,
                 currentWord: '',
                 selectedCells: [],
             };

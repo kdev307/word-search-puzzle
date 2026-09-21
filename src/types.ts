@@ -26,8 +26,13 @@ export type FoundWord = {
     cells?: Cell[];
     color?: string;
     direction: Direction;
+    revealed?: boolean
 };
 
+export type WordPath = {
+    path: Cell[];
+    direction: Direction;
+} | null;
 
 /////////////////////////////
 
@@ -87,7 +92,6 @@ export interface ExtendSelectionAction {
 
 export interface EndSelectionAction {
     type: typeof ACTIONS.END_SELECTION;
-    payload: WOWState;
 }
 
 export interface ValidateWordAction {
@@ -109,6 +113,11 @@ export interface FinishGameAction {
 export interface NeedHelpAction {
     type: typeof ACTIONS.NEED_HELP;
     payload: FoundWord;
+}
+
+export interface RevealSolution {
+    type: typeof ACTIONS.REVEAL_SOLUTION;
+    payload: FoundWord
 }
 
 export interface StartTimerAction {
@@ -133,6 +142,7 @@ export type WOWAction =
     | ReadyGameAction
     | FinishGameAction
     | NeedHelpAction
+    | RevealSolution
     | StartTimerAction
     | TickAction;
 

@@ -1,9 +1,10 @@
 import { toast } from 'react-toastify';
-import { ACTIONS } from '../constants/actions';
 import useWOW from '../hooks/useWOW';
 import type { Word } from '../types';
 import Title from './Title';
 import ToastHint from './ToastHint';
+import { useRef } from 'react';
+import { ACTIONS } from '../constants/actions';
 
 function FoundWords() {
     const { words, wordsFound } = useWOW();
@@ -31,6 +32,8 @@ interface WordProps {
 
 function Word({ word, isFound }: WordProps) {
     const { dispatch } = useWOW();
+    const clickTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
     const handleHint = () => {
         dispatch({ type: ACTIONS.NEED_HELP, payload: word });
         toast.info(
@@ -48,6 +51,37 @@ function Word({ word, isFound }: WordProps) {
             },
         );
     };
+
+    const handleFindWord = () => {
+        dispatch({ type: ACTIONS.REVEAL_SOLUTION, payload: word });
+
+        toast.info(
+            <div className="rounded-xl bg-white px-4 py-2 font-mono text-lg font-bold text-gray-900">
+                Highlighting Word: {word.word.toUpperCase()}!
+            </div>,
+            {
+                autoClose: 2000,
+                icon: false,
+            },
+        );
+    };
+
+    const handleClick = () => {
+        if (isFound) return;
+
+        if (clickTimeout.current) {
+            clearTimeout(clickTimeout.current);
+            clickTimeout.current = null;
+            handleFindWord();
+            return;
+        }
+
+        clickTimeout.current = setTimeout(() => {
+            handleHint();
+            clickTimeout.current = null;
+        }, 280);
+    };
+
     return (
         <li
             className={`rounded-xl px-4 py-2 text-center text-xl font-semibold transition-all duration-200 ${
@@ -55,9 +89,9 @@ function Word({ word, isFound }: WordProps) {
                     ? 'cursor-not-allowed bg-gray-700 text-gray-300'
                     : 'cursor-pointer bg-gray-900 text-gray-100 hover:bg-gray-200 hover:text-gray-800'
             } `}
-            onClick={handleHint}
+            onClick={handleClick}
         >
-            {word?.word?.toUpperCase()}
+            {word.word.toUpperCase()}
         </li>
     );
 }
