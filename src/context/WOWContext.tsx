@@ -6,7 +6,7 @@ import { generateColorPalette } from '../utils/generateColours';
 import { getDirection } from '../utils/cellSelection';
 // import type { Cell, FoundWord, Grid, Word } from '../types';
 
-import type { WOWAction, WOWContextType, WOWState } from '../types';
+import type { FoundWord, WOWAction, WOWContextType, WOWState } from '../types';
 
 import { GAME_SCORE } from '../constants/game';
 import { findWord } from '../utils/findWord';
@@ -89,10 +89,11 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
 
             const { path, direction } = result;
 
-            const newEntry = {
+            const newEntry: FoundWord = {
                 word: action.payload.word,
                 cells: path,
                 direction,
+                startingCoord: { row: path[0].row, col: path[0].col },
                 color: state.colors[state.wordsFound.length % state.colors.length],
                 revealed: true,
             };
@@ -144,6 +145,10 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
                     state.selectedCells[0],
                     state.selectedCells[state.selectedCells.length - 1],
                 ),
+                startingCoord: {
+                    row: state.selectedCells[0].row,
+                    col: state.selectedCells[0].col,
+                },
             };
             return {
                 ...state,

@@ -3,6 +3,8 @@ import { ACTIONS } from '../constants/actions';
 import useWOW from '../hooks/useWOW';
 import Cell from './Cell';
 import { getCellFromPointerEvent, getDirection, isStraightLine } from '../utils/cellSelection';
+import { getWordPillGeometry } from '../utils/selectionRounding';
+import type { Pill } from '../types';
 
 function Grid({ grid }: { grid: string[][] }) {
     const { dispatch, selectedCells, wordsFound } = useWOW();
@@ -86,11 +88,28 @@ function Grid({ grid }: { grid: string[][] }) {
     const getFoundWordCell = (row: number, col: number) =>
         wordsFound.find((fw) => fw.cells.some((cell) => cell.row === row && cell.col === col));
 
+    const rows = grid?.length ?? 0;
+    const cols = grid?.[0]?.length ?? 0;
+
+    const pills: Pill[] = [];
+
+    wordsFound.forEach((fw, idx) => {
+        const geo = getWordPillGeometry(fw.cells, rows, cols);
+
+        if (geo) pills.push({ ...geo, color: fw.color, key: `found-${idx}` });
+    });
+
+    if (selectedCells.length > 0) {
+        const geo = getWordPillGeometry(selectedCells, rows, cols);
+
+        if (geo) pills.push({ ...geo, color: '#1e2939', key: 'selection' });
+    }
+
     return (
         <div
-            className="grid w-full rounded-2xl bg-gray-200"
+            className="relative grid w-full rounded-2xl bg-gray-200"
             style={{
-                gridTemplateColumns: `repeat(${grid[0]?.length ?? 0}, 1fr)`,
+                gridTemplateColumns: `repeat(${cols}, 1fr)`,
                 userSelect: 'none',
                 touchAction: 'none',
             }}
@@ -99,7 +118,28 @@ function Grid({ grid }: { grid: string[][] }) {
             onPointerUp={handlePointerUp}
             onPointerLeave={endSelection}
         >
-            {grid.map((row, rowIdx) =>
+            {/* Higlighted overlay layer: pill drwan along each word */}
+            <div className="pointer-events-none absolute inset-0 z-0">
+                {pills.map((pill) => {
+                    return (
+                        <div
+                            key={pill.key}
+                            className="absolute rounded-full"
+                            style={{
+                                left: `${pill.midX}%`,
+                                top: `${pill.midY}%`,
+                                width: `${pill.length}%`,
+                                height: `${pill.thickness}%`,
+                                background: `${pill.color}`,
+                                opacity: 0.75,
+                                transform: `translate(-50%, -50%) rotate(${pill.angle}deg)`,
+                                transformOrigin: 'center',
+                            }}
+                        ></div>
+                    );
+                })}
+            </div>
+            {grid.flatMap((row, rowIdx) =>
                 row.map((letter, colIdx) => (
                     <Cell
                         key={`${rowIdx}-${colIdx}`}
@@ -107,7 +147,6 @@ function Grid({ grid }: { grid: string[][] }) {
                         data-col={colIdx}
                         selected={isSelected(rowIdx, colIdx)}
                         found={!!getFoundWordCell(rowIdx, colIdx)}
-                        color={getFoundWordCell(rowIdx, colIdx)?.color}
                     >
                         {letter}
                     </Cell>
