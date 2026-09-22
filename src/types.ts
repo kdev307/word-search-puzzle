@@ -15,24 +15,47 @@ export type Direction = {
 };
 
 
+// export type Word = {
+//     word: string;
+//     startingCoord: [number, number]
+//     direction: Direction;
+// };
+
+// export type FoundWord = {
+//     word: string;
+//     cells: Cell[];
+//     color?: string;
+//     direction: Direction;
+//     revealed?: boolean
+// };
+
 export type Word = {
     word: string;
-    startingCoord: [number, number]
+    cells: Cell[];
+    startingCoord: Cell;
     direction: Direction;
 };
 
-export type FoundWord = {
-    word: string;
-    cells?: Cell[];
+export type FoundWord = Word & {
     color?: string;
-    direction: Direction;
-    revealed?: boolean
+    revealed?: boolean;
 };
 
 export type WordPath = {
     path: Cell[];
     direction: Direction;
 } | null;
+
+
+export type Pill = {
+    midX: number;
+    midY: number;
+    length: number;
+    thickness: number;
+    angle: number;
+    color?: string;
+    key?: string;
+};
 
 /////////////////////////////
 
@@ -116,12 +139,12 @@ export interface FinishGameAction {
 
 export interface NeedHelpAction {
     type: typeof ACTIONS.NEED_HELP;
-    payload: FoundWord;
+    payload: Word;
 }
 
 export interface RevealSolution {
     type: typeof ACTIONS.REVEAL_SOLUTION;
-    payload: FoundWord
+    payload: Word
 }
 
 export interface StartTimerAction {

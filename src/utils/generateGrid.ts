@@ -1,4 +1,5 @@
 import { DIRECTIONS } from '../constants/game';
+import type { Cell } from '../types';
 import { generateGridLetters } from './generateGridLetter';
 import { canPlaceWord, placeWord } from './wordPlacement';
 
@@ -23,9 +24,16 @@ export function generateGrid(rows: number, columns: number, words: string[] = []
             if (canPlaceWord(word, row, col, dx, dy, grid, rows, columns)) {
                 placeWord(word, row, col, dx, dy, grid);
                 placed = true;
+
+                const cells: Cell[] = word.split('').map((_, index) => ({
+                    row: row + index * dx,
+                    col: col + index * dy,
+                }));
+
                 wordsInGrid.push({
                     word: word,
-                    startingCoord: [row, col],
+                    cells,
+                    startingCoord: { row, col },
                     direction: { dx, dy },
                 });
                 console.log(`✅ Placed word: ${word} at (${row},${col}) dir [${dx},${dy}]`);

@@ -1,8 +1,14 @@
 import { LightBulbIcon } from '@heroicons/react/24/solid';
-import type { Word } from '../types';
+import type { Cell, Direction } from '../types';
 import { directionToText } from '../utils/direction';
 
-function ToastHint({ word, startingCoord: start, direction }: Word) {
+interface ToastHintProps {
+    word: string;
+    startingCoord: Cell;
+    direction: Direction;
+}
+
+function ToastHint({ word, startingCoord: start, direction }: ToastHintProps) {
     return (
         <div className="flex w-full max-w-xl min-w-xs flex-col items-center justify-center gap-4 rounded-xl bg-gray-700/50 p-4 text-gray-50 shadow-lg backdrop-blur-md select-none">
             <div className="flex items-center gap-4">
@@ -22,8 +28,8 @@ function ToastHint({ word, startingCoord: start, direction }: Word) {
                 <div className="flex w-full justify-between rounded-lg bg-gray-50 p-2">
                     <span className="w-full font-semibold text-gray-700">Starts At</span>
                     <span className="w-full font-mono font-bold text-blue-900">
-                        {`Row: ${start[0] + 1}`}
-                        <br /> {`Column: ${start[1] + 1}`}
+                        {`Row: ${start.row + 1}`}
+                        <br /> {`Column: ${start.col + 1}`}
                     </span>
                 </div>
 
