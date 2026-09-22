@@ -1,73 +1,91 @@
-# React + TypeScript + Vite
+# Word Search Puzzle
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A relaxing word-search puzzle game. Hidden words are tucked into a 14×14 grid of
+letters, running in every direction. Trace them out, beat the clock, and clear
+the board.
 
-Currently, two official plugins are available:
+## Play Now
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+▶️ **[Play Word Search Puzzle](https://kdev307.github.io/word-search-puzzle/)**
 
-## React Compiler
+## How to Play
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+- A list of words sits beside the grid. Each one is hidden somewhere in the
+  letters — horizontally, vertically, or diagonally.
+- Click and drag across a straight line of letters to trace a word.
+- Trace a listed word correctly and it locks in with its own color.
+- Find every word to win.
 
-## Expanding the ESLint configuration
+## Need a Hand?
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Stuck on a word? Use the list beside the grid:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **Click a word** for a hint — it reveals where the word starts and which
+  direction it runs.
+- **Double-click a word** to reveal it fully on the grid.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Both cost a few points, so save them for when you're truly stuck.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Scoring
+
+| Action               | Points |
+| -------------------- | ------ |
+| Find a word yourself | +10    |
+| Use a hint           | −5     |
+| Reveal a word        | −10    |
+
+Your score and time are tracked as you play, and a summary of how you did
+appears once you clear the board. Your progress is saved automatically, so you
+can refresh and pick up right where you left off.
+
+## Tech Stack
+
+Built as a single-page React app.
+
+| Purpose          | Technology                        | Version |
+| ---------------- | --------------------------------- | ------- |
+| UI               | `react / react-dom`               | ^19.1.1 |
+| Build tooling    | `vite`                            | ^7.1.7  |
+| Styling          | `tailwindcss + @tailwindcss/vite` | ^4.1.16 |
+| Icons            | `@heroicons/react`                | ^2.2.0  |
+| Notifications    | `react-toastify`                  | ^11.0.5 |
+| Win celebrations | `canvas-confetti`                 | ^1.9.4  |
+| Linting          | `eslint`                          | ^9.36.0 |
+
+## Project Information
+
+- Single-page app, no backend — everything runs in the browser.
+- Game state is managed with React Context and a reducer.
+- Progress is stored in the browser's `sessionStorage`, so a refresh resumes
+  the current game.
+- Deployed as a static build to GitHub Pages.
+
+### Run Locally
+
+Requires Node.js 18+.
+
+```bash
+npm install     # install dependencies
+npm run dev     # start the dev server (default http://localhost:5173)
+npm run build   # production build to dist/
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Architecture
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+A brief map of how it fits together:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **State** — a single reducer (`context/WOWContext.jsx`) holds the grid, word
+  list, current selection, found words, score, hints/reveals used, and the
+  timer. It persists to `sessionStorage` on every change and restores on load.
+- **Grid generation** — words are placed at random positions and directions
+  (8-way), then the remaining cells are filled with random letters.
+- **Selection** — dragging locks a direction on the first move and extends only
+  along that straight line; the traced letters are matched against the word
+  list on release.
+- **Highlighting** — each found word (and the active drag) is drawn as a single
+  rounded capsule oriented along the word, so horizontal, vertical, and diagonal
+  finds all render as clean pills.
+- **Assists** — hints and reveals are dispatched from the word list; revealing a
+  word runs a depth-first search to locate its exact path on the grid.
+- **Results** — clearing the board opens a summary screen that grades the run
+  and breaks down score, time, and assists used.
