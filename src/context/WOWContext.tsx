@@ -1,105 +1,15 @@
 import { createContext, useEffect, useReducer } from 'react';
-import type { ReactNode, Dispatch } from 'react';
-import { ACTIONS, type ActionType } from '../constants/actions';
+import type { ReactNode } from 'react';
+import { ACTIONS } from '../constants/actions';
 import { clearSession, loadSession, saveSession } from '../utils/storage';
 import { generateColorPalette } from '../utils/generateColours';
 import { getDirection } from '../utils/cellSelection';
+// import type { Cell, FoundWord, Grid, Word } from '../types';
 
-interface WOWState {
-    grid: string[][];
-    words: string[];
-    selectedCells: { row: number; col: number }[];
-    currentWord: string;
-    score: number;
-    wordsFound: { word: string; cells: { row: number; col: number }[]; color: string }[];
-    status: ActionType;
-    loading: boolean;
-    colors: string[];
-    startTime: number | null;
-    timeTaken: number;
-}
+import type { WOWAction, WOWContextType, WOWState } from '../types';
 
-interface LoadingAction {
-    type: typeof ACTIONS.LOADING;
-    payload: boolean;
-}
-
-interface NewGameAction {
-    type: typeof ACTIONS.NEW_GAME;
-    payload: { grid: string[][]; words: string[] };
-}
-
-interface SelectCellAction {
-    type: typeof ACTIONS.SELECT_CELL;
-    payload: { row: number; col: number };
-}
-
-interface ClearSelectionAction {
-    type: typeof ACTIONS.CLEAR_SELECTION;
-}
-
-interface StartSelectionAction {
-    type: typeof ACTIONS.START_SELECTION;
-    payload: { row: number; col: number };
-}
-
-interface ExtendSelectionAction {
-    type: typeof ACTIONS.EXTEND_SELECTION;
-    payload: { row: number; col: number };
-}
-
-interface EndSelectionAction {
-    type: typeof ACTIONS.END_SELECTION;
-}
-
-interface ValidateWordAction {
-    type: typeof ACTIONS.VALIDATE_WORD;
-}
-
-interface ResetGameAction {
-    type: typeof ACTIONS.RESET_GAME;
-}
-
-interface ReadyGameAction {
-    type: typeof ACTIONS.READY_GAME;
-}
-
-interface FinishGameAction {
-    type: typeof ACTIONS.FINISH_GAME;
-}
-
-interface NeedHelpAction {
-    type: typeof ACTIONS.NEED_HELP;
-}
-
-interface StartTimerAction {
-    type: typeof ACTIONS.START_TIMER;
-}
-
-interface TickAction {
-    type: typeof ACTIONS.TICK;
-    payload: number;
-}
-
-type WOWAction =
-    | LoadingAction
-    | SelectCellAction
-    | ClearSelectionAction
-    | StartSelectionAction
-    | ExtendSelectionAction
-    | EndSelectionAction
-    | ValidateWordAction
-    | NewGameAction
-    | ResetGameAction
-    | ReadyGameAction
-    | FinishGameAction
-    | NeedHelpAction
-    | StartTimerAction
-    | TickAction;
-
-interface WOWContextType extends WOWState {
-    dispatch: Dispatch<WOWAction>;
-}
+import { GAME_SCORE } from '../constants/game';
+import { findWord } from '../utils/findWord';
 
 const gameSession = loadSession();
 
@@ -109,6 +19,8 @@ const initialState: WOWState = {
     currentWord: '',
     selectedCells: [],
     score: gameSession?.score ?? 0,
+    hintsUsed: gameSession?.hintsUsed ?? 0,
+    solutionsRevealed: gameSession?.solutionsRevealed ?? 0,
     wordsFound: gameSession?.wordsFound ?? [],
     status: ACTIONS.READY_GAME,
     loading: false,
@@ -127,8 +39,11 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
                 ...initialState,
                 grid: action.payload.grid,
                 words: action.payload.words,
+                score: 0,
+                hintsUsed: 0,
+                solutionsRevealed: 0,
                 loading: false,
-                status: ACTIONS.READY_GAME,
+                wordsFound: [],
                 colors: generateColorPalette(action.payload.words.length),
                 startTime: Date.now(),
                 timeTaken: 0,
@@ -139,6 +54,8 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
                 ...state,
                 wordsFound: [],
                 score: 0,
+                hintsUsed: 0,
+                solutionsRevealed: 0,
                 currentWord: '',
                 selectedCells: [],
                 loading: false,
@@ -157,8 +74,36 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
         case ACTIONS.NEED_HELP:
             return {
                 ...state,
-                status: ACTIONS.NEED_HELP,
+                score: state.score - GAME_SCORE.HINT_USED_PENALTY,
+                hintsUsed: state.hintsUsed + 1,
+                // wordsFound: [...state.wordsFound, action.payload],
             };
+
+        case ACTIONS.REVEAL_SOLUTION: {
+            const result = findWord(state.grid, action.payload.word);
+
+            if (!result) {
+                console.warn('Word not found in grid:', action.payload.word);
+                return state;
+            }
+
+            const { path, direction } = result;
+
+            const newEntry = {
+                word: action.payload.word,
+                cells: path,
+                direction,
+                color: state.colors[state.wordsFound.length % state.colors.length],
+                revealed: true,
+            };
+
+            return {
+                ...state,
+                wordsFound: [...state.wordsFound, newEntry],
+                score: state.score - GAME_SCORE.SOLUTION_REVEALED_PENALTY,
+                solutionsRevealed: state.solutionsRevealed + 1,
+            };
+        }
 
         case ACTIONS.START_SELECTION:
             return {
@@ -183,7 +128,7 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
         }
 
         case ACTIONS.END_SELECTION: {
-            const isFound = state.words.includes(state.currentWord);
+            const isFound = state.words.some((word) => word.word === state.currentWord);
             const isNewWord =
                 isFound && !state.wordsFound.some((fw) => fw.word === state.currentWord);
 
@@ -203,6 +148,7 @@ function wowReducer(state: WOWState, action: WOWAction): WOWState {
             return {
                 ...state,
                 wordsFound: isNewWord ? [...state.wordsFound, foundedWordData] : state.wordsFound,
+                score: isNewWord ? state.score + GAME_SCORE.WORD_FOUND_REWARD : state.score,
                 currentWord: '',
                 selectedCells: [],
             };
@@ -232,6 +178,8 @@ function WOWProvider({ children }: WOWProviderProps) {
         currentWord,
         selectedCells,
         score,
+        hintsUsed,
+        solutionsRevealed,
         wordsFound,
         status,
         loading,
@@ -241,14 +189,9 @@ function WOWProvider({ children }: WOWProviderProps) {
 
     useEffect(() => {
         if (!state.loading) {
-            saveSession({
-                grid: state.grid,
-                words: state.words,
-                wordsFound: state.wordsFound,
-                score: state.score,
-            });
+            saveSession(state);
         }
-    }, [state.grid, state.words, state.wordsFound, state.score, state.loading]);
+    }, [state]);
 
     useEffect(() => {
         if (!state.startTime || status === ACTIONS.FINISH_GAME) return;
@@ -271,6 +214,8 @@ function WOWProvider({ children }: WOWProviderProps) {
                 currentWord,
                 selectedCells,
                 score,
+                hintsUsed,
+                solutionsRevealed,
                 wordsFound,
                 status,
                 loading,

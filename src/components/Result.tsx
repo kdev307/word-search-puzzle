@@ -10,7 +10,8 @@ interface ResultProps {
 }
 
 function Result({ onHandleNewGame, onHandleRestartGame }: ResultProps) {
-    const { score, timeTaken, words } = useWOW();
+    const { score, timeTaken, hintsUsed, solutionsRevealed } = useWOW();
+
     return (
         <div className="flex flex-col items-center justify-center gap-6">
             <div className="flex items-center justify-center gap-6">
@@ -23,7 +24,7 @@ function Result({ onHandleNewGame, onHandleRestartGame }: ResultProps) {
                 <SparklesIcon className="size-10 animate-bounce" />
             </div>
             <p className="text-lg text-gray-700">You found all the words.</p>
-            <div className="flex items-center justify-center gap-32">
+            <div className="grid grid-cols-2 items-center justify-center gap-x-32 gap-y-0">
                 <Title
                     as="h3"
                     style="text-xl font-semibold mb-3 text-center text-gray-800 !normal-case "
@@ -40,7 +41,13 @@ function Result({ onHandleNewGame, onHandleRestartGame }: ResultProps) {
                     as="h3"
                     style="text-xl font-semibold mb-3 text-center text-gray-800 !normal-case "
                 >
-                    Hints used: {words.length - score / 10}
+                    Hints used: {hintsUsed}
+                </Title>
+                <Title
+                    as="h3"
+                    style="text-xl font-semibold mb-3 text-center text-gray-800 !normal-case "
+                >
+                    Solutions revealed: {solutionsRevealed}
                 </Title>
             </div>
             <div className="flex items-center justify-center gap-20">

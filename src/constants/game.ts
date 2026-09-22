@@ -14,3 +14,10 @@ export const DIRECTIONS = [
     [1, -1], // ↙ diagonal down-left
     [-1, 1], // ↗ diagonal up-right
 ];
+
+
+export const GAME_SCORE = {
+    WORD_FOUND_REWARD: 10,
+    HINT_USED_PENALTY: 5,
+    SOLUTION_REVEALED_PENALTY: 10,
+};

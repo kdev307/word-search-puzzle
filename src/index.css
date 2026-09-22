@@ -1,3 +1,4 @@
+
 @import 'tailwindcss';
 
 /* Scroll Bar */
@@ -27,4 +28,17 @@
 .scrollbar-hide {
     width: 0;
     background: transparent;
+}
+
+
+/* Toast Notification */
+
+.Toastify__toast {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+}
+
+.Toastify__toast-body {
+    width: 100%;
 }

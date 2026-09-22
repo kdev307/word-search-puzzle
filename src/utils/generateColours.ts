@@ -24,7 +24,7 @@ function hslToHex(h: number, s: number, l: number) {
     );
 }
 
-export function generateColorPalette(count: number): string[] {
+export function generateColorPalette(count: number) {
     const colors = [];
 
     for (let i = 0; i < count; i++) {
