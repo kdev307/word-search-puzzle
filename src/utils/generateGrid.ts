@@ -1,0 +1,54 @@
+import { DIRECTIONS } from '../constants/game';
+import type { Cell } from '../types';
+import { generateGridLetters } from './generateGridLetter';
+import { canPlaceWord, placeWord } from './wordPlacement';
+
+export function initializeGrid(rows: number, columns: number) {
+    return Array.from({ length: rows }, () => Array.from({ length: columns }, () => ''));
+}
+
+export function generateGrid(rows: number, columns: number, words: string[] = []) {
+    const grid = initializeGrid(rows, columns);
+
+    const wordsInGrid = [];
+
+    for (const word of words) {
+        let placed = false;
+        let attempts = 0;
+
+        while (!placed && attempts < 100) {
+            const [dx, dy] = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+            const row = Math.floor(Math.random() * rows);
+            const col = Math.floor(Math.random() * columns);
+
+            if (canPlaceWord(word, row, col, dx, dy, grid, rows, columns)) {
+                placeWord(word, row, col, dx, dy, grid);
+                placed = true;
+
+                const cells: Cell[] = word.split('').map((_, index) => ({
+                    row: row + index * dx,
+                    col: col + index * dy,
+                }));
+
+                wordsInGrid.push({
+                    word: word,
+                    cells,
+                    startingCoord: { row, col },
+                    direction: { dx, dy },
+                });
+                console.log(`✅ Placed word: ${word} at (${row},${col}) dir [${dx},${dy}]`);
+            }
+
+            attempts++;
+        }
+
+        if (!placed) {
+            console.warn(`❌ Could not place word: ${word}`);
+        }
+    }
+
+    const wordGrid = grid.map((row) =>
+        row.map((cell) => (cell === '' ? generateGridLetters().toUpperCase() : cell)),
+    );
+    return { grid: wordGrid, words: wordsInGrid };
+}

@@ -1,0 +1,23 @@
+export const GAME_SESSION_KEY = 'wowGameSession';
+
+export const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+export const rows = 14;
+export const columns = 14;
+
+export const DIRECTIONS = [
+    [0, 1], // → right
+    [0, -1], // ← left
+    [1, 0], // ↓ down
+    [-1, 0], // ↑ up
+    [1, 1], // ↘ diagonal down-right
+    [-1, -1], // ↖ diagonal up-left
+    [1, -1], // ↙ diagonal down-left
+    [-1, 1], // ↗ diagonal up-right
+];
+
+
+export const GAME_SCORE = {
+    WORD_FOUND_REWARD: 10,
+    HINT_USED_PENALTY: 5,
+    SOLUTION_REVEALED_PENALTY: 10,
+};

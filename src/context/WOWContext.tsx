@@ -1,0 +1,238 @@
+import { createContext, useEffect, useReducer } from 'react';
+import type { ReactNode } from 'react';
+import { ACTIONS } from '../constants/actions';
+import { clearSession, loadSession, saveSession } from '../utils/storage';
+import { generateColorPalette } from '../utils/generateColours';
+import { getDirection } from '../utils/cellSelection';
+// import type { Cell, FoundWord, Grid, Word } from '../types';
+
+import type { FoundWord, WOWAction, WOWContextType, WOWState } from '../types';
+
+import { GAME_SCORE } from '../constants/game';
+import { findWord } from '../utils/findWord';
+
+const gameSession = loadSession();
+
+const initialState: WOWState = {
+    grid: gameSession?.grid ?? [],
+    words: gameSession?.words ?? [],
+    currentWord: '',
+    selectedCells: [],
+    score: gameSession?.score ?? 0,
+    hintsUsed: gameSession?.hintsUsed ?? 0,
+    solutionsRevealed: gameSession?.solutionsRevealed ?? 0,
+    wordsFound: gameSession?.wordsFound ?? [],
+    status: ACTIONS.READY_GAME,
+    loading: false,
+    colors: gameSession?.colors ?? [],
+    startTime: null,
+    timeTaken: 0,
+};
+
+function wowReducer(state: WOWState, action: WOWAction): WOWState {
+    switch (action.type) {
+        case ACTIONS.LOADING:
+            return { ...state, loading: action.payload };
+        case ACTIONS.NEW_GAME:
+            clearSession();
+            return {
+                ...initialState,
+                grid: action.payload.grid,
+                words: action.payload.words,
+                score: 0,
+                hintsUsed: 0,
+                solutionsRevealed: 0,
+                loading: false,
+                wordsFound: [],
+                colors: generateColorPalette(action.payload.words.length),
+                startTime: Date.now(),
+                timeTaken: 0,
+            };
+
+        case ACTIONS.RESET_GAME:
+            return {
+                ...state,
+                wordsFound: [],
+                score: 0,
+                hintsUsed: 0,
+                solutionsRevealed: 0,
+                currentWord: '',
+                selectedCells: [],
+                loading: false,
+                status: ACTIONS.READY_GAME,
+                startTime: Date.now(),
+                timeTaken: 0,
+            };
+
+        case ACTIONS.FINISH_GAME:
+            return {
+                ...state,
+                status: ACTIONS.FINISH_GAME,
+                timeTaken: state.startTime ? Math.floor((Date.now() - state.startTime) / 1000) : 0,
+            };
+
+        case ACTIONS.NEED_HELP:
+            return {
+                ...state,
+                score: state.score - GAME_SCORE.HINT_USED_PENALTY,
+                hintsUsed: state.hintsUsed + 1,
+                // wordsFound: [...state.wordsFound, action.payload],
+            };
+
+        case ACTIONS.REVEAL_SOLUTION: {
+            const result = findWord(state.grid, action.payload.word);
+
+            if (!result) {
+                console.warn('Word not found in grid:', action.payload.word);
+                return state;
+            }
+
+            const { path, direction } = result;
+
+            const newEntry: FoundWord = {
+                word: action.payload.word,
+                cells: path,
+                direction,
+                startingCoord: { row: path[0].row, col: path[0].col },
+                color: state.colors[state.wordsFound.length % state.colors.length],
+                revealed: true,
+            };
+
+            return {
+                ...state,
+                wordsFound: [...state.wordsFound, newEntry],
+                score: state.score - GAME_SCORE.SOLUTION_REVEALED_PENALTY,
+                solutionsRevealed: state.solutionsRevealed + 1,
+            };
+        }
+
+        case ACTIONS.START_SELECTION:
+            return {
+                ...state,
+                selectedCells: [action.payload],
+                currentWord: state.grid[action.payload.row][action.payload.col],
+            };
+
+        case ACTIONS.EXTEND_SELECTION: {
+            const alreadySelected = state.selectedCells.some(
+                (cell) => cell.row === action.payload.row && cell.col === action.payload.col,
+            );
+
+            return alreadySelected
+                ? state
+                : {
+                      ...state,
+                      selectedCells: [...state.selectedCells, action.payload],
+                      currentWord:
+                          state.currentWord + state.grid[action.payload.row][action.payload.col],
+                  };
+        }
+
+        case ACTIONS.END_SELECTION: {
+            const isFound = state.words.some((word) => word.word === state.currentWord);
+            const isNewWord =
+                isFound && !state.wordsFound.some((fw) => fw.word === state.currentWord);
+
+            if (!isFound) {
+                return { ...state, currentWord: '', selectedCells: [] };
+            }
+
+            const foundedWordData = {
+                word: state.currentWord,
+                cells: state.selectedCells,
+                color: state.colors[state.wordsFound.length % state.colors.length],
+                direction: getDirection(
+                    state.selectedCells[0],
+                    state.selectedCells[state.selectedCells.length - 1],
+                ),
+                startingCoord: {
+                    row: state.selectedCells[0].row,
+                    col: state.selectedCells[0].col,
+                },
+            };
+            return {
+                ...state,
+                wordsFound: isNewWord ? [...state.wordsFound, foundedWordData] : state.wordsFound,
+                score: isNewWord ? state.score + GAME_SCORE.WORD_FOUND_REWARD : state.score,
+                currentWord: '',
+                selectedCells: [],
+            };
+        }
+        case ACTIONS.START_TIMER:
+            return { ...state, startTime: Date.now(), timeTaken: 0 };
+
+        case ACTIONS.TICK:
+            return { ...state, timeTaken: action.payload };
+
+        default:
+            throw new Error('Unknown Action');
+    }
+}
+
+const WOWContext = createContext(undefined as WOWContextType | undefined);
+
+interface WOWProviderProps {
+    children: ReactNode;
+}
+
+function WOWProvider({ children }: WOWProviderProps) {
+    const [state, dispatch] = useReducer(wowReducer, initialState);
+    const {
+        grid,
+        words,
+        currentWord,
+        selectedCells,
+        score,
+        hintsUsed,
+        solutionsRevealed,
+        wordsFound,
+        status,
+        loading,
+        colors,
+        timeTaken,
+    } = state;
+
+    useEffect(() => {
+        if (!state.loading) {
+            saveSession(state);
+        }
+    }, [state]);
+
+    useEffect(() => {
+        if (!state.startTime || status === ACTIONS.FINISH_GAME) return;
+
+        const interval = setInterval(() => {
+            dispatch({
+                type: ACTIONS.TICK,
+                payload: state.startTime ? Math.floor((Date.now() - state.startTime) / 1000) : 0,
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [status, state.startTime, dispatch]);
+
+    return (
+        <WOWContext.Provider
+            value={{
+                grid,
+                words,
+                currentWord,
+                selectedCells,
+                score,
+                hintsUsed,
+                solutionsRevealed,
+                wordsFound,
+                status,
+                loading,
+                colors,
+                timeTaken,
+                startTime: state.startTime,
+                dispatch,
+            }}
+        >
+            {children}
+        </WOWContext.Provider>
+    );
+}
+
+export { WOWContext, WOWProvider };
