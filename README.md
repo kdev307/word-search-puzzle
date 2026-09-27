@@ -1,4 +1,4 @@
-# Word Search Puzzle
+# Words of Wonder
 
 A relaxing word-search puzzle game. Hidden words are tucked into a 14×14 grid of
 letters, running in every direction. Trace them out, beat the clock, and clear
@@ -6,7 +6,21 @@ the board.
 
 ## Play Now
 
-▶️ **[Play Word Search Puzzle](https://kdev307.github.io/word-search-puzzle/)**
+▶️ **[Play Words of Wonder](https://dev-auriga.github.io/words-of-wonder/)**
+
+## Screenshots
+
+| Gameplay | Hint |
+| --- | --- |
+| ![Fresh puzzle board](screenshots/gameplay-start.png) | ![Hint toast showing a word's start and direction](screenshots/hint.png) |
+
+| Solution Reveal | Completed Board |
+| --- | --- |
+| ![Revealing a word deducts points](screenshots/solution-reveal.png) | ![All words found, shown as colored pills](screenshots/completed-board.png) |
+
+| Results |
+| --- |
+| ![End-of-game summary with score, time and assists](screenshots/result-modal.png) |
 
 ## How to Play
 
@@ -28,11 +42,11 @@ Both cost a few points, so save them for when you're truly stuck.
 
 ## Scoring
 
-| Action               | Points |
-| -------------------- | ------ |
-| Find a word yourself | +10    |
-| Use a hint           | −5     |
-| Reveal a word        | −10    |
+| Action | Points |
+| --- | --- |
+| Find a word yourself | +10 |
+| Use a hint | −5 |
+| Reveal a word | −10 |
 
 Your score and time are tracked as you play, and a summary of how you did
 appears once you clear the board. Your progress is saved automatically, so you
@@ -40,17 +54,17 @@ can refresh and pick up right where you left off.
 
 ## Tech Stack
 
-Built as a single-page React app.
+Built as a single-page React app. Versions reflect `package.json`.
 
-| Purpose          | Technology                        | Version |
-| ---------------- | --------------------------------- | ------- |
-| UI               | `react / react-dom`               | ^19.1.1 |
-| Build tooling    | `vite`                            | ^7.1.7  |
-| Styling          | `tailwindcss + @tailwindcss/vite` | ^4.1.16 |
-| Icons            | `@heroicons/react`                | ^2.2.0  |
-| Notifications    | `react-toastify`                  | ^11.0.5 |
-| Win celebrations | `canvas-confetti`                 | ^1.9.4  |
-| Linting          | `eslint`                          | ^9.36.0 |
+| Purpose | Technology | Version |
+| --- | --- | --- |
+| UI | `react` / `react-dom` | ^19.1.1 |
+| Build tooling | `vite` | ^7.1.7 |
+| Styling | `tailwindcss` + `@tailwindcss/vite` | ^4.1.16 |
+| Icons | `@heroicons/react` | ^2.2.0 |
+| Notifications | `react-toastify` | ^11.0.5 |
+| Win celebrations | `canvas-confetti` | ^1.9.4 |
+| Linting | `eslint` | ^9.36.0 |
 
 ## Project Information
 
