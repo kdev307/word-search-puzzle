@@ -111,7 +111,7 @@ function Grid({ grid }: { grid: string[][] }) {
             style={{
                 gridTemplateColumns: `repeat(${cols}, 1fr)`,
                 userSelect: 'none',
-                touchAction: 'none',
+                touchAction: 'manipulation',
             }}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}

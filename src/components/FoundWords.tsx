@@ -17,7 +17,7 @@ function FoundWords() {
                 Words to Find ({wordsFound.length}/{words.length})
             </Title>
 
-            <ul className="scrollbar flex max-h-140 w-full flex-col gap-3 overflow-auto pr-3">
+            <ul className="scrollbar flex max-h-150 w-full flex-wrap content-start justify-center gap-3 overflow-auto pr-1 lg:flex-col lg:flex-nowrap lg:justify-start lg:pr-3">
                 {words.map((word) => {
                     const foundWord = wordsFound.find((found) => found.word === word.word);
 
@@ -89,7 +89,8 @@ function Word({ word, isFound }: WordProps) {
 
     return (
         <li
-            className={`rounded-xl px-4 py-2 text-center text-xl font-semibold transition-all duration-200 select-none ${
+            style={{ touchAction: 'manipulation' }}
+            className={`rounded-xl px-4 py-2 text-center text-xl font-semibold whitespace-nowrap transition-all duration-200 select-none ${
                 isFound
                     ? 'cursor-not-allowed bg-gray-700 text-gray-300'
                     : 'cursor-pointer bg-gray-900 text-gray-100 hover:bg-gray-200 hover:text-gray-800'
