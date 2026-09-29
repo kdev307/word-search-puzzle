@@ -96,21 +96,21 @@ function WordsOfWonder() {
                             </Modal>
                         </>
                     </div>
-                    <div className="flex items-center justify-center gap-10">
+                    <div className="flex items-center justify-center gap-20">
                         <Title as="h2" style="text-2xl text-center font-semibold text-gray-400">
                             Score: {score}
                         </Title>
-
                         <Title as="h2" style="text-2xl text-center font-semibold text-gray-400">
                             Time: {formatTime(timeTaken)}
                         </Title>
                     </div>
-                    <div className="flex items-start justify-center gap-10">
+                    {/* Desktop layout: original, unchanged. Shown at lg and up. */}
+                    <div className="hidden items-center justify-center gap-10 lg:flex">
                         <div className="rounded-2xl bg-gray-600 p-2">
                             <Grid grid={grid} />
                         </div>
-                        <div className="flex w-full flex-col items-center justify-center gap-5">
-                            <div className="flex w-full items-center justify-center gap-10">
+                        <div className="flex flex-col items-center justify-center gap-4">
+                            <div className="flex items-center justify-center gap-4">
                                 <Button
                                     icon={<PlusIcon className="size-8" />}
                                     text="New Game"
@@ -124,6 +124,33 @@ function WordsOfWonder() {
                                     onClick={handleRestartGame}
                                 />
                             </div>
+
+                            <FoundWords />
+                        </div>
+                    </div>
+
+                    {/* Mobile layout: top-to-bottom — buttons, grid, then found words. */}
+                    <div className="flex w-full flex-col items-center gap-4 px-4 lg:hidden">
+                        <div className="flex items-center justify-center gap-4">
+                            <Button
+                                icon={<PlusIcon className="size-8" />}
+                                text="New Game"
+                                style="bg-gray-700 text-white w-full"
+                                onClick={handleNewGame}
+                            />
+                            <Button
+                                icon={<ArrowPathIcon className="size-8" />}
+                                text="Restart Game"
+                                style="bg-gray-700 text-white w-full"
+                                onClick={handleRestartGame}
+                            />
+                        </div>
+
+                        <div className="max-w-full overflow-auto rounded-2xl bg-gray-600 p-2">
+                            <Grid grid={grid} />
+                        </div>
+
+                        <div className="w-full">
                             <FoundWords />
                         </div>
                     </div>

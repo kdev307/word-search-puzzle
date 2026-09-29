@@ -16,7 +16,7 @@ function Cell({ children, selected, found, ...props }: CellProps) {
     }, [selected]);
     return (
         <div
-            className={`relative flex aspect-square min-w-14 cursor-pointer items-center justify-center overflow-clip text-center text-xl font-bold transition-all duration-150 select-none ${highlighted ? 'text-white' : 'rounded-xl text-gray-900 hover:bg-gray-300'}`}
+            className={`relative flex aspect-square min-w-8 cursor-pointer items-center justify-center overflow-clip text-center text-sm font-bold transition-all duration-150 select-none sm:min-w-12 sm:text-lg lg:min-w-14 lg:text-xl ${highlighted ? 'text-white' : 'rounded-xl text-gray-900 hover:bg-gray-300'}`}
             {...props}
         >
             {children}
